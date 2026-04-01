@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#">
+
+<!-- حتة جوجل لتحليل الموقع -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E6FX97WVER"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-E6FX97WVER');
+</script>
+
+<script>
+    // تهيئة فورية للغة والاتجاه عشان الصفحة ما ترعش وهي بتحمل
+    (function() {
+        var lang = localStorage.getItem('quran_ui_lang') || 'ar';
+        document.documentElement.lang = lang;
+        document.documentElement.dir = (lang === 'en') ? 'ltr' : 'rtl';
+        if (lang === 'en') {
+             document.documentElement.classList.add('en-mode');
+        }
+    })();
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- كلمات البحث والـ SEO -->
+    <title>قرآني | سماع وتحميل القرآن الكريم كاملاً بأصوات مشاهير القراء</title>
+    <meta name="title" content="قرآني - تجربة إيمانية متكاملة لسماع القرآن الكريم">
+    <meta name="description"
+        content="استمع للقرآن الكريم كاملاً بأصوات أشهر القراء بجودة عالية. تطبيق قرآني يوفر لك تجربة إيمانية متكاملة مع ميزات المساعد الذكي، مواقيت الصلاة، والسبحة الإلكترونية.">
+    <meta name="keywords"
+        content="القرآن الكريم, استماع القرآن, تحميل القرآن, قراء القرآن, ماهر المعيقلي, المنشاوي, تفسير القرآن, مساعد ديني ذكي, تطبيق إسلامي">
+    <meta name="author" content="عاصم محمد كمال ابو النصر">
+    <link rel="canonical" href="https://ralball74.github.io/qurany.assem/">
+
+    <!-- حوارات السوشيال ميديا وصورة اللينك (WhatsApp, TikTok, Facebook) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ralball74.github.io/qurany.assem/">
+    <meta property="og:site_name" content="تطبيق قرآني">
+    <meta property="og:locale" content="ar_SA">
+    <meta property="og:title" content="قرآني - رفيقك الإيماني">
+    <meta property="og:description"
+        content="استمع لأكثر من 30 قارئ، صمم كروت مشاركة لآياتك المفضلة، واسأل المساعد الذكي. تجربة قرآنية فريدة بتصميم زجاجي عصري.">
+    <meta property="og:image" content="https://ralball74.github.io/qurany.assem/images/icon-512x512.jpg">
+    <meta property="og:image:secure_url" content="https://ralball74.github.io/qurany.assem/images/icon-512x512.jpg">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="لوجو تطبيق قرآني">
+
+    <!-- تويتر (X) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="تطبيق قرآني - تصميم عصري لتجربة إيمانية متكاملة">
+    <meta name="twitter:description" content="رفيقك في رحلة القرآن: استماع، قراءة، وتفاعل مع الذكاء الاصطناعي.">
+    <meta name="twitter:image" content="https://ralball74.github.io/qurany.assem/images/icon-512x512.jpg">
+    <meta name="twitter:image:alt" content="لوجو تطبيق قرآني">
+
+    <!-- تنسيقات إضافية -->
+    <meta name="theme-color" content="#1abc9c">
+    <meta name="apple-mobile-web-app-title" content="قرآني">
+    <meta name="application-name" content="قرآني">
+
+    <!-- واتساب وأبل -->
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+
+    <!-- بيانات منظمة لجوجل -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "قرآني",
+      "url": "https://ralball74.github.io/qurany.assem/",
+      "description": "تطبيق متكامل لاستماع القرآن الكريم بأصوات القراء المفضلين لديك مع ميزات ذكية ومتطورة.",
+      "applicationCategory": "ReferenceApplication",
+      "operatingSystem": "All",
+      "author": {
+        "@type": "Person",
+        "name": "عاصم محمد كمال ابو النصر"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="others/style.css">
+    <!-- خطوط جوجل -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600&family=Tajawal:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="manifest" href="others/manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <!-- أيقونات Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="light-mode">
+    <!-- خلفية متدرجة متحركة (Mesh Gradient) -->
+    <div class="mesh-gradient-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- اللوجو والبحث فوق -->
+        <header class="top-header">
+            <div class="header-top">
+                <div class="logo">
+                    <img src="images/icon-512x512.jpg" alt="لوجو تطبيق قرآني - استماع القرآن الكريم" class="logo-img">
+                    <h1>قرآني</h1>
+                </div>
+                <div class="user-actions">
+
+                    <button id="lang-btn" title="اختيار اللغة"
+                        style="background: none; border: none; font-size: 1.2rem; color: var(--text-muted); margin-left: 15px;">
+                        <i class="fas fa-globe"></i>
+                    </button>
+                    <div class="theme-toggle" style="display: inline-block; vertical-align: middle;">
+                        <input type="checkbox" id="theme-switch" />
+                        <label for="theme-switch" class="switch-label">
+                            <i class="fas fa-moon"></i>
+                            <i class="fas fa-sun"></i>
+                            <span class="ball"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search" style="color: var(--text-muted);"></i>
+                <input type="text" id="surah-search" placeholder="ابحث عن سورة أو آية...">
+                <div class="search-toggle-btn" id="search-type-toggle" title="تغيير نوع البحث">
+                    <span id="search-type-label">سورة</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- تنبيه لو مفيش نت -->
+        <div id="offline-banner" class="offline-banner" style="display: none;">
+            <i class="fas fa-wifi-slash"></i>
+            <span>لا يوجد اتصال بالإنترنت - تعمل فقط السور المحملة</span>
+        </div>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <section id="content-area" class="content-scroll page-animate">
+                <!-- قسم القراء -->
+                <div class="section-header">
+                    <h2>القراء</h2>
+                </div>
+                <div id="reciters-grid" class="reciters-carousel">
+                    <!-- Skeletons for reciters -->
+                    <div class="reciter-skeleton">
+                        <div class="skeleton-circle skeleton"></div>
+                        <div class="skeleton-name skeleton"></div>
+                    </div>
+                    <div class="reciter-skeleton">
+                        <div class="skeleton-circle skeleton"></div>
+                        <div class="skeleton-name skeleton"></div>
+                    </div>
+                    <div class="reciter-skeleton">
+                        <div class="skeleton-circle skeleton"></div>
+                        <div class="skeleton-name skeleton"></div>
+                    </div>
+                    <div class="reciter-skeleton">
+                        <div class="skeleton-circle skeleton"></div>
+                        <div class="skeleton-name skeleton"></div>
+                    </div>
+                </div>
+
+                <!-- قائمة السور -->
+                <div class="section-header">
+                    <h2 id="current-category">السور</h2>
+                </div>
+                <div id="surah-list" class="surah-grid">
+                    <!-- Skeletons for surahs -->
+                    <div class="surah-card-skeleton">
+                        <div class="skeleton-number skeleton"></div>
+                        <div class="skeleton-info">
+                            <div class="skeleton-title skeleton"></div>
+                            <div class="skeleton-text skeleton"></div>
+                        </div>
+                        <div class="skeleton-icon skeleton"></div>
+                    </div>
+                    <div class="surah-card-skeleton">
+                        <div class="skeleton-number skeleton"></div>
+                        <div class="skeleton-info">
+                            <div class="skeleton-title skeleton"></div>
+                            <div class="skeleton-text skeleton"></div>
+                        </div>
+                        <div class="skeleton-icon skeleton"></div>
+                    </div>
+                    <div class="surah-card-skeleton">
+                        <div class="skeleton-number skeleton"></div>
+                        <div class="skeleton-info">
+                            <div class="skeleton-title skeleton"></div>
+                            <div class="skeleton-text skeleton"></div>
+                        </div>
+                        <div class="skeleton-icon skeleton"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- المساعد الذكي -->
+            <section id="ai-section" class="ai-view page-animate" style="display: none;">
+                <div class="ai-header">
+                    <h2>مساعدك الذكي</h2>
+                    <p>اسألني عن أي شيء في القرآن أو الدين</p>
+                </div>
+                <div id="chat-container" class="chat-container">
+                    <div class="message ai-message">
+                        <div class="message-avatar">
+                            <div class="modern-ai-icon-container">
+                                <div class="ai-icon-glow"></div>
+                                <div class="ai-icon-sparkle"></div>
+                            </div>
+                        </div>
+                        <div class="message-content">أهلاً، كيف يمكنني إعانتك اليوم؟.🤍</div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="ai-input" placeholder="اكتب سؤالك هنا..." autocomplete="off">
+                    </div>
+                    <button id="send-ai-btn" disabled><i class="fas fa-arrow-left"></i></button>
+                </div>
+            </section>
+
+            <!-- أدوات إضافية -->
+            <section id="others-section" class="others-view page-animate" style="display: none;">
+                <div class="section-header">
+                    <h2>أخرى</h2>
+                </div>
+                <div class="others-grid">
+
+
+                    <div class="other-card" id="about-dev-btn">
+                        <div class="other-icon"><i class="fas fa-user-tie"></i></div>
+                        <div class="other-info">
+                            <h3>عن المطور</h3>
+                            <p>معلومات عن مبرمج التطبيق</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+                    <div class="other-card" id="dua-day-btn">
+                        <div class="other-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                        <div class="other-info">
+                            <h3>دعاء اليوم</h3>
+                            <p>دعاء متجدد كل يوم</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+                    <div class="other-card" id="rosary-btn">
+                        <div class="other-icon"><i class="fas fa-fingerprint"></i></div>
+                        <div class="other-info">
+                            <h3>السبحة الإلكترونية</h3>
+                            <p>عداد تسبيح</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+                    <div class="other-card" id="prayer-times-btn">
+                        <div class="other-icon"><i class="fas fa-mosque"></i></div>
+                        <div class="other-info">
+                            <h3>مواقيت الصلاة</h3>
+                            <p>مواعيد الصلاة اليومية</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+                    <div class="other-card" id="videos-btn">
+                        <div class="other-icon"><i class="fab fa-youtube"></i></div>
+                        <div class="other-info">
+                            <h3>فيديوهات دينية</h3>
+                            <p>شاهد فيديوهات وقوائم تشغيل دينية</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- عن المطور - تصميم هادئ وراقي -->
+            <section id="about-view" class="others-subview page-animate" style="display: none;">
+                <div class="view-header">
+                    <button class="back-btn" id="about-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>عن المطور</h2>
+                </div>
+                
+                <div class="calm-dev-container">
+                    <div class="dev-pearl-card">
+                        <div class="dev-header-minimal">
+                            <div class="avatar-breath-wrapper">
+                                <img src="images/me.png" alt="عاصم محمد كمال" class="dev-avatar-calm">
+                            </div>
+                            <h3 class="dev-name-elegant">عاصم م ابو النصر</h3>
+                            <p class="dev-subtitle">مطور برمجيات وصانع تجارب رقمية</p>
+                        </div>
+
+                        <div class="dev-message-zen">
+                            <p>"الحمد لله الذي سخر لنا هذا لخدمة كتابه الكريم. أسعى لتقديم تجربة تقنية هادئة تعينكم على ذكر الله."</p>
+                        </div>
+
+                        <div class="zen-action-links">
+                            <a href="https://portfolio-for-assem.netlify.app" target="_blank" class="zen-link">
+                                <i class="fas fa-leaf"></i>
+                                <span>الموقع الشخصي</span>
+                            </a>
+                            <a href="https://ralball74.github.io/TadfuqStore/" target="_blank" class="zen-link">
+                                <i class="fas fa-briefcase"></i>
+                                <span>معرض الأعمال</span>
+                            </a>
+                            <a href="https://wa.me/3197010225434" target="_blank" class="zen-link">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>خدمة العملاء</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="dev-footer-zen">
+                        <p>بصمة تدفق للبرمجيات &copy; 2026</p>
+                        <span class="sadaqa-tag">صدقة جارية</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- دعاء اليوم -->
+            <section id="dua-view" class="others-subview page-animate" style="display: none;">
+                <div class="view-header">
+                    <button class="back-btn" id="dua-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>دعاء اليوم</h2>
+                </div>
+                <div class="dua-container" id="dua-content-container">
+                    <p class="dua-text" id="dua-text-el"></p>
+                </div>
+            </section>
+
+
+
+            <!-- السبحة الإلكترونية -->
+            <section id="rosary-view" class="others-subview page-animate" style="display: none;">
+                <div class="view-header">
+                    <button class="back-btn" id="rosary-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>المسبحة الإلكترونية</h2>
+                </div>
+                <div class="rosary-container">
+                    <div class="rosary-display">
+                        <span id="rosary-count">0</span>
+                        <span class="rosary-label">تسبيح</span>
+                    </div>
+                    <div class="rosary-body">
+                        <button id="rosary-increment-btn" class="rosary-btn">
+                            <div class="rosary-inner-circle"></div>
+                        </button>
+                    </div>
+                    <button id="rosary-reset-btn" class="rosary-reset" title="تصفير العداد"><i
+                            class="fas fa-redo"></i></button>
+                </div>
+            </section>
+
+            <!-- مواقيت الصلاة -->
+            <section id="prayer-view" class="others-subview page-animate" style="display: none;">
+                <div class="view-header">
+                    <button class="back-btn" id="prayer-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>مواقيت الصلاة</h2>
+                </div>
+                <div class="prayer-container">
+                    <div class="prayer-date-card">
+                        <h3 id="prayer-gregorian-date">--/--/----</h3>
+                        <p id="prayer-hijri-date">-- -- ----</p>
+                        <div class="location-badge" id="prayer-location"><i class="fas fa-map-marker-alt"></i> تحديد
+                            الموقع...</div>
+                    </div>
+
+                    <div class="prayer-countdown-card" id="prayer-countdown-card" style="display: none;">
+                        <span class="countdown-label">يبقي على أذان <span id="next-prayer-name">--</span></span>
+                        <div class="countdown-timer" id="countdown-timer">00:00:00</div>
+                    </div>
+                    <div id="prayer-times-list" class="prayer-list">
+                        <div class="loader">جاري جلب القِبلة والمواقيت...</div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- فيديوهات دينية -->
+            <section id="videos-view" class="others-subview page-animate" style="display: none;">
+                <div class="view-header">
+                    <button class="back-btn" id="videos-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>فيديوهات دينية</h2>
+                </div>
+                <div class="videos-container">
+                    <div class="video-tabs">
+                        <button class="video-tab-btn active" data-tab="videos-list">فيديوهات</button>
+                        <button class="video-tab-btn" data-tab="playlists-list">قوائم التشغيل</button>
+                    </div>
+
+                    <div id="videos-list" class="video-content-area active">
+                        <div class="playlists-grid" id="individual-videos-grid">
+                            <!-- الفيديوهات هتظهر هنا عشوائياً بالـ JS -->
+                        </div>
+
+                        <!-- عارض الفيديو الفردي -->
+                        <div id="single-video-player-view" style="display: none;">
+                            <div class="view-header">
+                                <button class="back-btn" id="single-video-back"><i
+                                        class="fas fa-arrow-right"></i></button>
+                                <h2 id="current-video-title">مشاهدة الفيديو</h2>
+                            </div>
+                            <div class="playlist-card">
+                                <iframe id="single-youtube-player" src="" title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="playlists-list" class="video-content-area">
+                        <div class="playlists-grid" id="playlists-grid-container">
+                            <!-- Playlist Cards -->
+                            <div class="playlist-main-card" data-playlist="innahu-rabbi">
+                                <div class="playlist-card-image">
+                                    <img src="https://img.youtube.com/vi/-zMW2Rqjwcc/maxresdefault.jpg" alt="إنه ربي">
+                                    <div class="playlist-overlay">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-info">
+                                    <h3>إنه ربي - أسماء الله الحسنى</h3>
+                                    <p>سلسلة شرح أسماء الله الحسنى - شريف علي</p>
+                                    <span class="playlist-badge">34 حلقة</span>
+                                </div>
+                            </div>
+
+                            <div class="playlist-main-card" data-playlist="majalis-quran">
+                                <div class="playlist-card-image">
+                                    <img src="https://img.youtube.com/vi/1lpcJ-YE0EU/maxresdefault.jpg"
+                                        alt="مجالس القرآن">
+                                    <div class="playlist-overlay">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-info">
+                                    <h3>مجالس القرآن - أحمد عامر</h3>
+                                    <p>سلسلة مجالس القرآن وتدبر السور - أحمد عامر</p>
+                                    <span class="playlist-badge">22 حلقة</span>
+                                </div>
+                            </div>
+
+                            <div class="playlist-main-card" data-playlist="tadawuq-ibadat">
+                                <div class="playlist-card-image">
+                                    <img src="https://img.youtube.com/vi/63_AOCldyXo/maxresdefault.jpg"
+                                        alt="تذوق العبادات">
+                                    <div class="playlist-overlay">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-info">
+                                    <h3>تذوق العبادات - أحمد العربي</h3>
+                                    <p>سلسلة تذوق العبادات (الصلاة، القرآن، الدعاء، الذكر)</p>
+                                    <span class="playlist-badge">4 حلقات</span>
+                                </div>
+                            </div>
+
+                            <div class="playlist-main-card" data-playlist="waey-akhlaq">
+                                <div class="playlist-card-image">
+                                    <img src="https://img.youtube.com/vi/zzWhkMWlIo0/maxresdefault.jpg"
+                                        alt="وعي - الأخلاق">
+                                    <div class="playlist-overlay">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-info">
+                                    <h3>وعي - سلسلة الأخلاق</h3>
+                                    <p>أهمية الأخلاق والمعاملات في الإسلام - وعي</p>
+                                    <span class="playlist-badge">12 حلقة</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- عارض القائمة الحالي (بيظهر لما تختار قائمة) -->
+                        <div id="playlist-player-view" style="display: none;">
+                            <div class="view-header">
+                                <button class="back-btn" id="playlist-player-back"><i
+                                        class="fas fa-arrow-right"></i></button>
+                                <h2 id="current-playlist-title">إنه ربي</h2>
+                            </div>
+                            <div class="playlist-header">
+                                <button id="show-playlist-items-btn" class="playlist-select-btn">
+                                    <i class="fas fa-list-ul"></i>
+                                    اختر حلقة من القائمة
+                                </button>
+                            </div>
+                            <div class="playlist-card">
+                                <iframe id="youtube-player" src="" title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- عرض الآيات -->
+            <div id="ayah-viewer" class="ayah-viewer">
+                <div class="ayah-header">
+                    <h3 id="viewer-title">سورة الفاتحة</h3>
+                    <button id="close-viewer"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="ayah-content" class="ayah-content">
+                </div>
+            </div>
+        </main>
+
+        <!-- بار المشغل تحت -->
+        <footer class="player-bar">
+            <!-- كانفاس المرئيات الصوتية -->
+            <canvas id="audio-visualizer" class="audio-visualizer"></canvas>
+
+            <!-- المحتوى المصغر عند السكرول -->
+            <div class="player-mini-content" id="player-maximize-btn">
+                <img src="images/4.jpg" alt="صورة القارئ" class="mini-img" id="mini-player-img">
+                <div class="mini-arrow"><i class="fas fa-chevron-up"></i></div>
+            </div>
+
+            <!-- محتوى المشغل الكامل -->
+            <div class="player-content-full">
+                <!-- بيانات السورة والتحكم -->
+                <div class="song-info">
+                    <div class="info-left">
+                        <img src="images/4.jpg" alt="صورة القارئ - تطبيق قرآني" id="player-img">
+                        <div class="text">
+                            <h4 id="player-surah">اختر سورة</h4>
+                            <p id="player-reciter">ماهر المعيقلي</p>
+                        </div>
+                    </div>
+                    <div class="info-actions">
+                        <button id="download-btn" class="download-btn" title="تحميل السورة"><i
+                                class="fas fa-cloud-download-alt"></i></button>
+                        <button id="show-text-btn" class="text-btn" title="عرض الآيات"><i
+                                class="fas fa-file-alt"></i></button>
+                        <button id="fav-btn" class="fav-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                </div>
+
+                <!-- زراير التحكم -->
+                <div class="player-controls">
+                    <div class="progress-area">
+                        <span id="current-time" class="time-label">00:00</span>
+                        <div class="progress-bar">
+                            <div id="progress-filled"></div>
+                        </div>
+                        <span id="duration" class="time-label">00:00</span>
+                    </div>
+                    <div class="buttons">
+                        <button id="prev-btn"><i class="fas fa-step-backward"></i></button>
+                        <button id="play-btn" class="play-main"><i class="fas fa-play"></i></button>
+                        <button id="next-btn"><i class="fas fa-step-forward"></i></button>
+                    </div>
+                </div>
+            </div>
+
+        </footer>
+
+        <!-- المنيو تحت -->
+        <nav class="sidebar">
+            <div class="nav-menu">
+                <button class="nav-item active" data-target="home">
+                    <i class="fas fa-home"></i>
+                    <span>الرئيسية</span>
+                </button>
+                <button class="nav-item" data-target="favorites">
+                    <i class="fas fa-heart"></i>
+                    <span>المفضلة</span>
+                </button>
+                <button class="nav-item" data-target="ai">
+                    <div class="modern-ai-icon-container">
+                        <div class="ai-icon-glow"></div>
+                        <div class="ai-icon-sparkle"></div>
+                    </div>
+                    <span>المساعد</span>
+                </button>
+                <button class="nav-item" data-target="others">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>أخرى</span>
+                </button>
+            </div>
+            <div class="app-copyright">Tadfuq Company ©</div>
+        </nav>
+    </div>
+
+    <!-- بانر تثبيت التطبيق PWA -->
+    <div id="pwa-install-banner" class="pwa-install-banner" style="display:none;">
+        <div class="pwa-install-content">
+            <div class="pwa-icon-wrap">
+                <img src="images/icon-512x512.jpg" alt="أيقونة قرآني" class="pwa-app-icon">
+            </div>
+            <div class="pwa-text">
+                <h3>ثبّت تطبيق قرآني</h3>
+                <p>استمتع بتجربة أفضل واستمع للقرآن حتى بدون إنترنت</p>
+            </div>
+            <div class="pwa-actions">
+                <button id="pwa-install-btn" class="pwa-btn-install">
+                    <i class="fas fa-download"></i>
+                    تثبيت
+                </button>
+                <button id="pwa-dismiss-btn" class="pwa-btn-dismiss">
+                    لاحقاً
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- تنبيه الصلاة على النبي -->
+    <div id="salawat-modal" class="modal salawat-modal">
+        <div class="modal-content salawat-content">
+            <div class="salawat-icon" id="salawat-icon-container">
+                <i class="fas fa-heart" id="salawat-icon"></i>
+            </div>
+            <h3 class="salawat-title" id="salawat-title">🤍صلى على اشرف الخلق🤍</h3>
+            <p class="salawat-text" id="salawat-text">صلى عليه وخد حسنات وادعيلي</p>
+            <button id="close-salawat" class="salawat-btn">عليه الصلاة والسلام</button>
+        </div>
+    </div>
+
+    <!-- نافذة اللغات -->
+    <div id="language-modal" class="modal">
+        <div class="modal-content language-modal-content">
+            <h3 id="lang-modal-title">اختر اللغة / Language</h3>
+            <div class="language-options">
+                <button id="btn-lang-en-ui" class="lang-option-btn">
+                    <div class="lang-icon"><i class="fas fa-desktop"></i></div>
+                    <div class="lang-info">
+                        <span class="lang-name">English</span>
+                        <span class="lang-desc">UI Only / التطبيق فقط</span>
+                    </div>
+                </button>
+                <button id="btn-lang-en-quran" class="lang-option-btn">
+                    <div class="lang-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="lang-info">
+                        <span class="lang-name">English</span>
+                        <span class="lang-desc">Quran & Tafseer / القراءة والتفسير</span>
+                    </div>
+                </button>
+                <button id="btn-lang-en-full" class="lang-option-btn">
+                    <div class="lang-icon"><i class="fas fa-globe"></i></div>
+                    <div class="lang-info">
+                        <span class="lang-name">English</span>
+                        <span class="lang-desc">Full App / تطبيق شامل</span>
+                    </div>
+                </button>
+                <button id="btn-lang-ar" class="lang-option-btn">
+                    <div class="lang-icon"><i class="fas fa-language"></i></div>
+                    <div class="lang-info">
+                        <span class="lang-name">العربية</span>
+                        <span class="lang-desc">Default / الوضع الافتراضي</span>
+                    </div>
+                </button>
+            </div>
+            <button id="close-language" class="close-modal-btn">إغلاق / Close</button>
+        </div>
+    </div>
+
+    <!-- مودال التفسير -->
+    <div id="tafsir-modal" class="modal">
+        <div class="modal-content tafsir-content">
+            <div class="tafsir-header">
+                <div class="tafsir-header-main">
+                    <h3 id="tafsir-title">تفسير الآية</h3>
+                    <div class="tafsir-selector">
+                        <select id="tafsir-engine-select">
+                            <option value="ar.muyassar">تفسير الميسر</option>
+                            <option value="ar.jalalayn">تفسير الجلالين</option>
+                            <option value="ar.qurtubi">تفسير القرطبي</option>
+                            <option value="ar.baghawi">تفسير البغوي</option>
+                            <option value="ar.waseet">تفسير الوسيط</option>
+                            <option value="ar.miqbas">تنوير المقباس</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="close-tafsir"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="tafsir-body" class="tafsir-body">
+                <div class="loader">جاري تحميل التفسير...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال كروت المشاركة -->
+    <div id="share-modal" class="modal">
+        <div class="modal-content share-content">
+            <div class="view-header">
+                <button class="back-btn" id="close-share"><i class="fas fa-times"></i></button>
+                <h2>مشاركة الآية</h2>
+            </div>
+            <div class="share-preview-container">
+                <div id="share-card-preview" class="share-card-preview">
+                    <!-- الصورة الناتجة هتظهر هنا -->
+                    <div class="loader">جاري تجهيز الكارت...</div>
+                </div>
+            </div>
+            <div class="share-actions">
+                <button id="download-card-btn" class="share-btn primary">
+                    <i class="fas fa-download"></i>
+                    حفظ الصورة
+                </button>
+                <button id="native-share-btn" class="share-btn secondary">
+                    <i class="fas fa-share-alt"></i>
+                    مشاركة مباشرة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- كانفاس مخفي لتوليد الصور -->
+    <canvas id="share-canvas" width="1080" height="1080" style="display: none;"></canvas>
+
+
+
+    <!-- مودال اختيار الحلقات -->
+    <div id="playlist-modal" class="modal">
+        <div class="modal-content playlist-modal-content">
+            <div class="view-header">
+                <button class="back-btn" id="close-playlist-modal"><i class="fas fa-times"></i></button>
+                <h2>اختر حلقة</h2>
+            </div>
+            <div id="playlist-items-container" class="playlist-items-grid">
+                <!-- الحلقات هتظهر هنا بالـ JS -->
+            </div>
+        </div>
+    </div>
+
+
+    <audio id="main-audio" src=""></audio>
+    <script src="js/reciters.js"></script>
+    <script src="js/duas.js"></script>
+
+    <script src="js/translations.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/ai-service.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    // التشكيك في تحديث الـ SW
+                    reg.update();
+                });
+            });
+
+            // ري لود لو فيه تغيير
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    window.location.reload();
+                    refreshing = true;
+                }
+            });
+        }
+
+        // لوجيك تثبيت الـ PWA
+        let deferredPrompt;
+        const pwaInstallBanner = document.getElementById('pwa-install-banner');
+        const pwaInstallBtn = document.getElementById('pwa-install-btn');
+        const pwaDismissBtn = document.getElementById('pwa-dismiss-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // أظهر البانر لو مكنش مغلق
+            const dismissed = localStorage.getItem('pwa-install-dismissed');
+            if (!dismissed) {
+                setTimeout(() => {
+                    pwaInstallBanner.style.display = 'flex';
+                    requestAnimationFrame(() => {
+                        pwaInstallBanner.classList.add('visible');
+                    });
+                }, 2000);
+            }
+        });
+
+        pwaInstallBtn && pwaInstallBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            pwaInstallBanner.classList.remove('visible');
+            setTimeout(() => { pwaInstallBanner.style.display = 'none'; }, 400);
+        });
+
+        pwaDismissBtn && pwaDismissBtn.addEventListener('click', () => {
+            localStorage.setItem('pwa-install-dismissed', '1');
+            pwaInstallBanner.classList.remove('visible');
+            setTimeout(() => { pwaInstallBanner.style.display = 'none'; }, 400);
+        });
+
+        // اخفيه عند التثبيت
+        window.addEventListener('appinstalled', () => {
+            pwaInstallBanner.classList.remove('visible');
+            setTimeout(() => { pwaInstallBanner.style.display = 'none'; }, 400);
+            deferredPrompt = null;
+        });
+    </script>
+</body>
+
+
+</html>
