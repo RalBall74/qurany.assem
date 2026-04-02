@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quran-app-v6';
+const CACHE_NAME = 'quran-app-v8';
 const AUDIO_CACHE_NAME = 'quran-audio-v1';
 
 const CORE_ASSETS = [
