@@ -39,6 +39,9 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
+    // We only want to handle GET requests. POST, PUT, DELETE, etc. are not cacheable.
+    if (event.request.method !== 'GET') return;
+
     const url = new URL(event.request.url);
 
     // 1. Audio Files: Use the cached copy if we have it, otherwise download it.
@@ -57,8 +60,9 @@ self.addEventListener("fetch", event => {
                 }
                 console.log('[SW] Audio from network:', event.request.url);
                 return fetch(event.request).then(networkResponse => {
-                    // لو الجلب نجح، نحفظه في الكاش للمرة الجاية
-                    if (networkResponse.ok) {
+                    // لو الجلب نجح واستلمنا ملف كامل (status 200)، نحفظه في الكاش للمرة الجاية
+                    // الـ 206 (Partial Content) مش بتتحفظ في الكاش مع cache.put
+                    if (networkResponse.ok && networkResponse.status === 200) {
                         cache.put(event.request.url, networkResponse.clone());
                     }
                     return networkResponse;
@@ -73,8 +77,10 @@ self.addEventListener("fetch", event => {
         event.respondWith(
             caches.match(event.request).then(cachedResponse => {
                 const fetchPromise = fetch(event.request).then(networkResponse => {
-                    const clonedResponse = networkResponse.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
+                    if (networkResponse.ok && networkResponse.status === 200) {
+                        const clonedResponse = networkResponse.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
+                    }
                     return networkResponse;
                 });
                 // Return cached version immediately if found, otherwise wait for network
@@ -90,16 +96,20 @@ self.addEventListener("fetch", event => {
             if (cachedResponse) {
                 // Update cache in the background but return cached immediately
                 fetch(event.request).then(networkResponse => {
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse.clone()));
+                    if (networkResponse.ok && networkResponse.status === 200) {
+                        caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse.clone()));
+                    }
                 }).catch(() => { });
                 return cachedResponse;
             }
             // If not in cache, fetch and put in cache
             return fetch(event.request).then(networkResponse => {
-                const clonedResponse = networkResponse.clone();
-                caches.open(CACHE_NAME).then(cache => {
-                    cache.put(event.request, clonedResponse);
-                });
+                if (networkResponse.ok && networkResponse.status === 200) {
+                    const clonedResponse = networkResponse.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, clonedResponse);
+                    });
+                }
                 return networkResponse;
             }).catch(error => {
                 console.error('Fetch failed or offline:', error);
