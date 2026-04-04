@@ -88,18 +88,33 @@
     </script>
 
     <link rel="stylesheet" href="others/style.css">
+    <!-- تحسين التحميل المسبق -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://api.alquran.cloud">
+
     <!-- خطوط جوجل -->
     <link
         href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600&family=Tajawal:wght@300;400;500;700&display=swap"
-        rel="stylesheet">
+        rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    </noscript>
+
     <link rel="manifest" href="others/manifest.json">
     <meta name="theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-    <!-- أيقونات Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- أيقونات Font Awesome - تحميل غير مانع للعرض -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </noscript>
 </head>
 
 <body class="light-mode notranslate">
@@ -117,7 +132,7 @@
         <header class="top-header">
             <div class="header-top">
                 <div class="logo">
-                    <img src="images/icon-512x512.jpg" alt="لوجو تطبيق قرآني - استماع القرآن الكريم" class="logo-img">
+                    <img src="images/icon-512x512.jpg" alt="لوجو تطبيق قرآني - استماع القرآن الكريم" class="logo-img" fetchpriority="high">
                     <h1>قرآني</h1>
                 </div>
                 <div class="user-actions">
@@ -308,7 +323,7 @@
                     <div class="dev-pearl-card">
                         <div class="dev-header-minimal">
                             <div class="avatar-breath-wrapper">
-                                <img src="images/me.png" alt="عاصم محمد كمال" class="dev-avatar-calm">
+                                <img src="images/me.png" alt="عاصم محمد كمال" class="dev-avatar-calm" loading="lazy">
                             </div>
                             <h3 class="dev-name-elegant">عاصم ابو النصر</h3>
                             <p class="dev-subtitle">مطور برمجيات وصانع تجارب رقمية</p>
@@ -444,7 +459,7 @@
                             <!-- Playlist Cards -->
                             <div class="playlist-main-card" data-playlist="innahu-rabbi">
                                 <div class="playlist-card-image">
-                                    <img src="https://img.youtube.com/vi/-zMW2Rqjwcc/maxresdefault.jpg" alt="إنه ربي">
+                                    <img src="https://img.youtube.com/vi/-zMW2Rqjwcc/hqdefault.jpg" alt="إنه ربي" loading="lazy">
                                     <div class="playlist-overlay">
                                         <i class="fas fa-play-circle"></i>
                                     </div>
@@ -458,8 +473,8 @@
 
                             <div class="playlist-main-card" data-playlist="majalis-quran">
                                 <div class="playlist-card-image">
-                                    <img src="https://img.youtube.com/vi/1lpcJ-YE0EU/maxresdefault.jpg"
-                                        alt="مجالس القرآن">
+                                    <img src="https://img.youtube.com/vi/1lpcJ-YE0EU/hqdefault.jpg"
+                                        alt="مجالس القرآن" loading="lazy">
                                     <div class="playlist-overlay">
                                         <i class="fas fa-play-circle"></i>
                                     </div>
@@ -473,8 +488,8 @@
 
                             <div class="playlist-main-card" data-playlist="tadawuq-ibadat">
                                 <div class="playlist-card-image">
-                                    <img src="https://img.youtube.com/vi/63_AOCldyXo/maxresdefault.jpg"
-                                        alt="تذوق العبادات">
+                                    <img src="https://img.youtube.com/vi/63_AOCldyXo/hqdefault.jpg"
+                                        alt="تذوق العبادات" loading="lazy">
                                     <div class="playlist-overlay">
                                         <i class="fas fa-play-circle"></i>
                                     </div>
@@ -488,8 +503,8 @@
 
                             <div class="playlist-main-card" data-playlist="waey-akhlaq">
                                 <div class="playlist-card-image">
-                                    <img src="https://img.youtube.com/vi/zzWhkMWlIo0/maxresdefault.jpg"
-                                        alt="وعي - الأخلاق">
+                                    <img src="https://img.youtube.com/vi/zzWhkMWlIo0/hqdefault.jpg"
+                                        alt="وعي - الأخلاق" loading="lazy">
                                     <div class="playlist-overlay">
                                         <i class="fas fa-play-circle"></i>
                                     </div>
@@ -762,12 +777,12 @@
 
 
     <audio id="main-audio" src=""></audio>
-    <script src="js/reciters.js"></script>
-    <script src="js/duas.js"></script>
+    <script src="js/reciters.js" defer></script>
+    <script src="js/duas.js" defer></script>
 
-    <script src="js/translations.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/ai-service.js"></script>
+    <script src="js/translations.js" defer></script>
+    <script src="js/app.js" defer></script>
+    <script src="js/ai-service.js" defer></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

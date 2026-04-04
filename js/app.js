@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderReciters() {
         recitersGridEl.innerHTML = recitersData.map(r => `
             <li class="reciter-card ${r.id === reciter.id ? 'active' : ''}" data-id="${r.id}" role="listitem">
-                <img src="${r.img}" alt="${t(r.name)}">
+                <img src="${r.img}" alt="${t(r.name)}" loading="lazy">
                 <p>${t(r.name)}</p>
             </li>
         `).join('');
@@ -424,34 +424,34 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        surahListEl.innerHTML = '';
-        surahList.forEach((surah, index) => {
-            const card = document.createElement('li');
-            card.className = 'surah-card';
-            card.setAttribute('role', 'listitem');
-            card.dataset.index = surahs.indexOf(surah);
-            card.style.animationDelay = `${index * 0.05}s`;
+        const isEng = window.currentUiLang === 'en';
+        const ayahLabel = isEng ? 'Ayahs' : 'آية';
 
-            const isPlayingThis = surahs.indexOf(surah) === curIdx;
+        surahListEl.innerHTML = surahList.map((surah, index) => {
+            const idx = surahs.indexOf(surah);
+            const isPlayingThis = idx === curIdx;
+            const sName = isEng ? surah.englishName : surah.name;
+            const revType = isEng ? (surah.revelationType === 'Meccan' ? 'Meccan' : 'Medinan') : (surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية');
 
-            const sName = window.currentUiLang === 'en' ? surah.englishName : surah.name;
-            const revType = window.currentUiLang === 'en' ? (surah.revelationType === 'Meccan' ? 'Meccan' : 'Medinan') : (surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية');
-            const ayahLabel = window.currentUiLang === 'en' ? 'Ayahs' : 'آية';
-            card.innerHTML = `
-                <div class="number">${surah.number}</div>
-                <div class="surah-info">
-                    <h3>${sName}</h3>
-                    <p>${revType} - ${surah.numberOfAyahs} ${ayahLabel}</p>
-                </div>
-                <i class="fas ${isPlayingThis && isPlaying ? 'fa-pause-circle' : 'fa-play-circle'} play-icon-pulse"></i>
+            return `
+                <li class="surah-card" role="listitem" data-index="${idx}" style="animation-delay: ${index * 0.05}s">
+                    <div class="number">${surah.number}</div>
+                    <div class="surah-info">
+                        <h3>${sName}</h3>
+                        <p>${revType} - ${surah.numberOfAyahs} ${ayahLabel}</p>
+                    </div>
+                    <i class="fas ${isPlayingThis && isPlaying ? 'fa-pause-circle' : 'fa-play-circle'} play-icon-pulse"></i>
+                </li>
             `;
+        }).join('');
 
+        // إضافة أحداث الضغط باستخدام التفويض (Event Delegation) كان ممكن بس السهولة هنا نربطهم دلوقتى أو نسيبهم كدة
+        // بس خلينا نربطهم عشان اللوجيك الحالى معتمد على الـ context
+        document.querySelectorAll('.surah-card').forEach(card => {
             card.addEventListener('click', () => {
                 const idx = parseInt(card.dataset.index);
                 playSurah(surahs[idx], idx);
             });
-
-            surahListEl.appendChild(card);
         });
     }
 

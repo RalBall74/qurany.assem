@@ -2,6 +2,7 @@ const CACHE_NAME = 'quran-app-v11';
 const AUDIO_CACHE_NAME = 'quran-audio-v1';
 
 const CORE_ASSETS = [
+    './',
     './index.html',
     './others/style.css',
     './js/app.js',
@@ -11,7 +12,10 @@ const CORE_ASSETS = [
     './js/ai-service.js',
     './others/manifest.json',
     './images/icon-192x192.png',
-    './images/icon-512x512.jpg'
+    './images/icon-512x512.jpg',
+    './images/me.png',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+    'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600&family=Tajawal:wght@300;400;500;700&display=swap'
 ];
 
 self.addEventListener("install", event => {
