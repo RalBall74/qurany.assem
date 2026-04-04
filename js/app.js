@@ -238,35 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
 
-        // تفويض الأحداث للقوائم لتحسين الأداء
-        if (surahListEl) {
-            surahListEl.addEventListener('click', (e) => {
-                const card = e.target.closest('.surah-card');
-                if (card) {
-                    const idx = parseInt(card.dataset.index);
-                    playSurah(surahs[idx], idx);
-                }
-            });
-        }
-
-        if (recitersGridEl) {
-            recitersGridEl.addEventListener('click', (e) => {
-                const card = e.target.closest('.reciter-card');
-                if (card) {
-                    const id = card.dataset.id;
-                    reciter = recitersData.find(r => r.id === id);
-                    document.querySelectorAll('.reciter-card').forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    playerReciter.textContent = t(reciter.name);
-                    playerImg.src = reciter.img;
-                    if (miniPlayerImg) miniPlayerImg.src = reciter.img;
-                    if (curIdx !== -1) playSurah(surahs[curIdx]);
-                }
-            });
-        }
-
         // ضروري عشان الـ Audio Visualizer يقدر يقرأ الترددات من السيرفر (CORS)
         playerAudio.crossOrigin = "anonymous";
+
+        // تحديث بطاقة الترحيب والتحية
         updateHeroCard();
     }
 
@@ -420,10 +395,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderReciters() {
         recitersGridEl.innerHTML = recitersData.map(r => `
             <li class="reciter-card ${r.id === reciter.id ? 'active' : ''}" data-id="${r.id}" role="listitem">
-                <img src="${r.img}" alt="${t(r.name)}" loading="lazy">
+                <img src="${r.img}" alt="${t(r.name)}">
                 <p>${t(r.name)}</p>
             </li>
         `).join('');
+
+        document.querySelectorAll('.reciter-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.dataset.id;
+                reciter = recitersData.find(r => r.id === id);
+                document.querySelectorAll('.reciter-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                playerReciter.textContent = t(reciter.name);
+                playerImg.src = reciter.img;
+                if (miniPlayerImg) miniPlayerImg.src = reciter.img;
+
+                if (curIdx !== -1) {
+                    playSurah(surahs[curIdx]);
+                }
+
+            });
+        });
     }
 
     function renderSurahs(surahList) {
@@ -432,26 +424,35 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const isEng = window.currentUiLang === 'en';
-        const ayahLabel = isEng ? 'Ayahs' : 'آية';
+        surahListEl.innerHTML = '';
+        surahList.forEach((surah, index) => {
+            const card = document.createElement('li');
+            card.className = 'surah-card';
+            card.setAttribute('role', 'listitem');
+            card.dataset.index = surahs.indexOf(surah);
+            card.style.animationDelay = `${index * 0.05}s`;
 
-        surahListEl.innerHTML = surahList.map((surah, index) => {
-            const idx = surah.number - 1; // الوصول المباشر للأندكس بدل indexOf المجهد
-            const isPlayingThis = idx === curIdx;
-            const sName = isEng ? surah.englishName : surah.name;
-            const revType = isEng ? (surah.revelationType === 'Meccan' ? 'Meccan' : 'Medinan') : (surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية');
+            const isPlayingThis = surahs.indexOf(surah) === curIdx;
 
-            return `
-                <li class="surah-card" role="listitem" data-index="${idx}" style="animation-delay: ${index * 0.01}s">
-                    <div class="number">${surah.number}</div>
-                    <div class="surah-info">
-                        <h3>${sName}</h3>
-                        <p>${revType} - ${surah.numberOfAyahs} ${ayahLabel}</p>
-                    </div>
-                    <i class="fas ${isPlayingThis && isPlaying ? 'fa-pause-circle' : 'fa-play-circle'} play-icon-pulse"></i>
-                </li>
+            const sName = window.currentUiLang === 'en' ? surah.englishName : surah.name;
+            const revType = window.currentUiLang === 'en' ? (surah.revelationType === 'Meccan' ? 'Meccan' : 'Medinan') : (surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية');
+            const ayahLabel = window.currentUiLang === 'en' ? 'Ayahs' : 'آية';
+            card.innerHTML = `
+                <div class="number">${surah.number}</div>
+                <div class="surah-info">
+                    <h3>${sName}</h3>
+                    <p>${revType} - ${surah.numberOfAyahs} ${ayahLabel}</p>
+                </div>
+                <i class="fas ${isPlayingThis && isPlaying ? 'fa-pause-circle' : 'fa-play-circle'} play-icon-pulse"></i>
             `;
-        }).join('');
+
+            card.addEventListener('click', () => {
+                const idx = parseInt(card.dataset.index);
+                playSurah(surahs[idx], idx);
+            });
+
+            surahListEl.appendChild(card);
+        });
     }
 
     // لوجيك الصوت والتحكم في المشغل
