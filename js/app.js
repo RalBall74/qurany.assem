@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // جرب نجيب من الكاش الأول عشان السرعة
         try {
-            const cache = await caches.open('quran-app-v4');
+            const cache = await caches.open('quran-app-v8');
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // جرب الكاش الأول
         try {
-            const cache = await caches.open('quran-app-v4');
+            const cache = await caches.open('quran-app-v8');
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
@@ -1762,16 +1762,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const audioCache = await caches.open('quran-audio-v1');
-            const apiCache = await caches.open('quran-app-v4'); // استخدام نفس الكاش بتاع الـ SW
+            const apiCache = await caches.open('quran-app-v8');
 
-            // بص يا معلم هنحمل الملف كله ونحطه في خزانة المتصفح للأبد (أو لحد ما يمسحه)
+            // تحمل الملف كله ونحطه في خزانة المتصفح للأبد
+            // استخدمنا fetch هنا عشان نضمن التحكم في الأخطاء وكمان عشان مشاكل الـ CORS في بعض المتصفحات
+            const audioResponse = await fetch(url, { mode: 'no-cors' });
+            await audioCache.put(url, audioResponse);
+
             // وكمان هنحمل النص عشان يشتغل بدون انترنت في "وضع القراءة"
-
-            const audioPromise = audioCache.add(url);
             const textUrl = `https://api.alquran.cloud/v1/surah/${surahNumber}`;
-            const textPromise = apiCache.add(textUrl);
-
-            await Promise.all([audioPromise, textPromise]);
+            const textResponse = await fetch(textUrl);
+            if (textResponse.ok) {
+                await apiCache.put(textUrl, textResponse);
+            }
 
             // نحدث شكل الزرار لما نخلص التحميل بنجاح ونظهر علامة الصح الشيك
             checkDownloadStatus(url);
