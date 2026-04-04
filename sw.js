@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quran-app-v8';
+const CACHE_NAME = 'quran-app-v9';
 const AUDIO_CACHE_NAME = 'quran-audio-v1';
 
 const CORE_ASSETS = [
@@ -34,7 +34,7 @@ self.addEventListener("activate", event => {
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim())
     );
 });
 
@@ -44,9 +44,24 @@ self.addEventListener("fetch", event => {
     // 1. Audio Files: Use the cached copy if we have it, otherwise download it.
     if (url.pathname.endsWith('.mp3')) {
         event.respondWith(
-            caches.open(AUDIO_CACHE_NAME).then(cache => {
-                return cache.match(event.request).then(response => {
-                    return response || fetch(event.request);
+            caches.open(AUDIO_CACHE_NAME).then(async cache => {
+                // جرب أولاً بالـ URL عشان نتجنب مشاكل الـ headers المختلفة
+                let response = await cache.match(event.request.url);
+                if (!response) {
+                    // جرب بالـ Request نفسه كـ fallback
+                    response = await cache.match(event.request);
+                }
+                if (response) {
+                    console.log('[SW] Audio from cache:', event.request.url);
+                    return response;
+                }
+                console.log('[SW] Audio from network:', event.request.url);
+                return fetch(event.request).then(networkResponse => {
+                    // لو الجلب نجح، نحفظه في الكاش للمرة الجاية
+                    if (networkResponse.ok) {
+                        cache.put(event.request.url, networkResponse.clone());
+                    }
+                    return networkResponse;
                 });
             })
         );

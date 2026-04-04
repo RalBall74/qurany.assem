@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // جرب نجيب من الكاش الأول عشان السرعة
         try {
-            const cache = await caches.open('quran-app-v8');
+            const cache = await caches.open('quran-app-v9');
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // جرب الكاش الأول
         try {
-            const cache = await caches.open('quran-app-v8');
+            const cache = await caches.open('quran-app-v9');
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
@@ -1753,6 +1753,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function downloadSurah(url) {
         if (!downloadBtn || curIdx === -1) return;
 
+        // تنبيه لو مفيش نت أصلاً
+        if (!navigator.onLine) {
+            alert(t('لا يوجد اتصال بالإنترنت. يرجى التأكد من الاتصال لتحميل السور لأول مرة.'));
+            return;
+        }
+
         const surah = surahs[curIdx];
         const surahNumber = surah.number;
 
@@ -1762,25 +1768,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const audioCache = await caches.open('quran-audio-v1');
-            const apiCache = await caches.open('quran-app-v8');
+            const apiCache = await caches.open('quran-app-v9');
 
-            // تحمل الملف كله ونحطه في خزانة المتصفح للأبد
-            // استخدمنا fetch هنا عشان نضمن التحكم في الأخطاء وكمان عشان مشاكل الـ CORS في بعض المتصفحات
-            const audioResponse = await fetch(url, { mode: 'no-cors' });
-            await audioCache.put(url, audioResponse);
+            // نحمل ملف الصوت ونحطه في الكاش
+            // لازم نستخدم fetch عادي (مش no-cors) عشان الـ opaque response مش بيشتغل مع الـ audio player
+            console.log('[Download] بدء تحميل:', url);
+            const audioResponse = await fetch(url);
+            if (!audioResponse.ok) {
+                throw new Error(`Audio fetch failed: ${audioResponse.status}`);
+            }
+            await audioCache.put(url, audioResponse.clone());
+            console.log('[Download] تم حفظ الصوت في الكاش بنجاح');
 
             // وكمان هنحمل النص عشان يشتغل بدون انترنت في "وضع القراءة"
-            const textUrl = `https://api.alquran.cloud/v1/surah/${surahNumber}`;
-            const textResponse = await fetch(textUrl);
-            if (textResponse.ok) {
-                await apiCache.put(textUrl, textResponse);
+            try {
+                const textUrl = `https://api.alquran.cloud/v1/surah/${surahNumber}`;
+                const textResponse = await fetch(textUrl);
+                if (textResponse.ok) {
+                    await apiCache.put(textUrl, textResponse.clone());
+                }
+            } catch (textErr) {
+                console.warn('[Download] فشل تحميل النص (الصوت تم بنجاح):', textErr);
             }
 
             // نحدث شكل الزرار لما نخلص التحميل بنجاح ونظهر علامة الصح الشيك
             checkDownloadStatus(url);
 
         } catch (error) {
-            console.error('Download failed:', error);
+            console.error('[Download] فشل التحميل:', error);
             downloadBtn.className = 'download-btn';
             downloadBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
             downloadBtn.title = t('فشل التحميل');
