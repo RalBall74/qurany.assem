@@ -251,23 +251,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showSurahSkeletons() {
         surahListEl.innerHTML = Array(12).fill(0).map(() => `
-            <li class="surah-card-skeleton" role="listitem">
+            <div class="surah-card-skeleton">
                 <div class="skeleton-number skeleton"></div>
                 <div class="skeleton-info">
                     <div class="skeleton-title skeleton"></div>
                     <div class="skeleton-text skeleton"></div>
                 </div>
                 <div class="skeleton-icon skeleton"></div>
-            </li>
+            </div>
         `).join('');
     }
 
     function showReciterSkeletons() {
         recitersGridEl.innerHTML = Array(8).fill(0).map(() => `
-            <li class="reciter-skeleton" role="listitem">
+            <div class="reciter-skeleton">
                 <div class="skeleton-circle skeleton"></div>
                 <div class="skeleton-name skeleton"></div>
-            </li>
+            </div>
         `).join('');
     }
 
@@ -282,10 +282,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showPrayerSkeletons() {
         prayerTimesList.innerHTML = Array(6).fill(0).map(() => `
-            <li class="prayer-item-skeleton" role="listitem">
+            <div class="prayer-item-skeleton">
                 <div class="skeleton-prayer-name skeleton"></div>
                 <div class="skeleton-prayer-time skeleton"></div>
-            </li>
+            </div>
         `).join('');
     }
 
@@ -306,10 +306,10 @@ document.addEventListener('DOMContentLoaded', () => {
         playlistItemsContainer.innerHTML = currentActivePlaylist.map((item, index) => {
             const isActive = youtubePlayer.src.includes(item.id);
             return `
-                <li class="playlist-item-card ${isActive ? 'active' : ''}" data-id="${item.id}" data-idx="${index}" role="listitem">
+                <div class="playlist-item-card ${isActive ? 'active' : ''}" data-id="${item.id}" data-idx="${index}">
                     <div class="ep-num">${index + 1}</div>
                     <div class="playlist-item-name">${item.title}</div>
-                </li>
+                </div>
             `;
         }).join('');
 
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // جرب نجيب من الكاش الأول عشان السرعة
         try {
-            const cache = await caches.open('quran-app-v11');
+            const cache = await caches.open('quran-app-v10');
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // جرب الكاش الأول
         try {
-            const cache = await caches.open('quran-app-v11');
+            const cache = await caches.open('quran-app-v10');
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
@@ -394,10 +394,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // رسم الواجهة وعرض البيانات
     function renderReciters() {
         recitersGridEl.innerHTML = recitersData.map(r => `
-            <li class="reciter-card ${r.id === reciter.id ? 'active' : ''}" data-id="${r.id}" role="listitem">
+            <div class="reciter-card ${r.id === reciter.id ? 'active' : ''}" data-id="${r.id}">
                 <img src="${r.img}" alt="${t(r.name)}">
                 <p>${t(r.name)}</p>
-            </li>
+            </div>
         `).join('');
 
         document.querySelectorAll('.reciter-card').forEach(card => {
@@ -426,9 +426,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         surahListEl.innerHTML = '';
         surahList.forEach((surah, index) => {
-            const card = document.createElement('li');
+            const card = document.createElement('div');
             card.className = 'surah-card';
-            card.setAttribute('role', 'listitem');
             card.dataset.index = surahs.indexOf(surah);
             card.style.animationDelay = `${index * 0.05}s`;
 
@@ -1769,7 +1768,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const audioCache = await caches.open('quran-audio-v1');
-            const apiCache = await caches.open('quran-app-v11');
+            const apiCache = await caches.open('quran-app-v10');
 
             // نحمل ملف الصوت ونحطه في الكاش
             // لازم نستخدم fetch عادي (مش no-cors) عشان الـ opaque response مش بيشتغل مع الـ audio player

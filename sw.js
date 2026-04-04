@@ -1,7 +1,8 @@
-const CACHE_NAME = 'quran-app-v11';
+const CACHE_NAME = 'quran-app-v10';
 const AUDIO_CACHE_NAME = 'quran-audio-v1';
 
 const CORE_ASSETS = [
+    './',
     './index.html',
     './others/style.css',
     './js/app.js',

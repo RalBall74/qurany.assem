@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" xml:lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#" class="notranslate">
+<html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#" class="notranslate">
 
 <!-- حتة جوجل لتحليل الموقع -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E6FX97WVER"></script>
@@ -13,22 +13,19 @@
 
 <script>
     // تهيئة فورية للغة والاتجاه عشان الصفحة ما ترعش وهي بتحمل
-    (function () {
-        if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-            location.replace(location.href.replace('http:', 'https:'));
-        }
+    (function() {
         var lang = localStorage.getItem('quran_ui_lang') || 'ar';
         document.documentElement.lang = lang;
         document.documentElement.dir = (lang === 'en') ? 'ltr' : 'rtl';
         if (lang === 'en') {
-            document.documentElement.classList.add('en-mode');
+             document.documentElement.classList.add('en-mode');
         }
     })();
 </script>
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google" content="notranslate">
 
     <!-- كلمات البحث والـ SEO -->
@@ -103,8 +100,6 @@
 </head>
 
 <body class="light-mode notranslate">
-    <!-- رابط التخطي للوصول السريع للمحتوى -->
-    <a href="#content-area" class="skip-link">انتقل إلى المحتوى الرئيسي</a>
     <!-- خلفية متدرجة متحركة (Mesh Gradient) -->
     <div class="mesh-gradient-container">
         <div class="blob blob-1"></div>
@@ -122,26 +117,24 @@
                 </div>
                 <div class="user-actions">
 
-                    <button id="lang-btn" title="اختيار اللغة" aria-label="اختيار لغة التطبيق"
+                    <button id="lang-btn" title="اختيار اللغة"
                         style="background: none; border: none; font-size: 1.2rem; color: var(--text-muted); margin-left: 15px;">
                         <i class="fas fa-globe"></i>
                     </button>
                     <div class="theme-toggle" style="display: inline-block; vertical-align: middle;">
-                        <input type="checkbox" id="theme-switch" aria-label="تبديل الوضع الليلي والنهاري" />
-                        <label for="theme-switch" class="switch-label" title="تبديل المظهر">
-                            <i class="fas fa-moon" aria-hidden="true"></i>
-                            <i class="fas fa-sun" aria-hidden="true"></i>
+                        <input type="checkbox" id="theme-switch" />
+                        <label for="theme-switch" class="switch-label">
+                            <i class="fas fa-moon"></i>
+                            <i class="fas fa-sun"></i>
                             <span class="ball"></span>
                         </label>
                     </div>
                 </div>
             </div>
-            <div class="search-bar" role="search">
-                <i class="fas fa-search" style="color: var(--text-muted);" aria-hidden="true"></i>
-                <input type="text" id="surah-search" placeholder="ابحث عن سورة أو آية..."
-                    aria-label="ابحث عن سورة أو آية">
-                <div class="search-toggle-btn" id="search-type-toggle" title="تغيير نوع البحث" role="button"
-                    aria-pressed="false" aria-label="تغيير نوع البحث الحالي">
+            <div class="search-bar">
+                <i class="fas fa-search" style="color: var(--text-muted);"></i>
+                <input type="text" id="surah-search" placeholder="ابحث عن سورة أو آية...">
+                <div class="search-toggle-btn" id="search-type-toggle" title="تغيير نوع البحث">
                     <span id="search-type-label">سورة</span>
                 </div>
             </div>
@@ -160,57 +153,57 @@
                 <div class="section-header">
                     <h2>القراء</h2>
                 </div>
-                <ul id="reciters-grid" class="reciters-carousel" role="list">
+                <div id="reciters-grid" class="reciters-carousel">
                     <!-- Skeletons for reciters -->
-                    <li class="reciter-skeleton">
+                    <div class="reciter-skeleton">
                         <div class="skeleton-circle skeleton"></div>
                         <div class="skeleton-name skeleton"></div>
-                    </li>
-                    <li class="reciter-skeleton">
+                    </div>
+                    <div class="reciter-skeleton">
                         <div class="skeleton-circle skeleton"></div>
                         <div class="skeleton-name skeleton"></div>
-                    </li>
-                    <li class="reciter-skeleton">
+                    </div>
+                    <div class="reciter-skeleton">
                         <div class="skeleton-circle skeleton"></div>
                         <div class="skeleton-name skeleton"></div>
-                    </li>
-                    <li class="reciter-skeleton">
+                    </div>
+                    <div class="reciter-skeleton">
                         <div class="skeleton-circle skeleton"></div>
                         <div class="skeleton-name skeleton"></div>
-                    </li>
-                </ul>
+                    </div>
+                </div>
 
                 <!-- قائمة السور -->
                 <div class="section-header">
                     <h2 id="current-category">السور</h2>
                 </div>
-                <ul id="surah-list" class="surah-grid" role="list">
+                <div id="surah-list" class="surah-grid">
                     <!-- Skeletons for surahs -->
-                    <li class="surah-card-skeleton">
+                    <div class="surah-card-skeleton">
                         <div class="skeleton-number skeleton"></div>
                         <div class="skeleton-info">
                             <div class="skeleton-title skeleton"></div>
                             <div class="skeleton-text skeleton"></div>
                         </div>
                         <div class="skeleton-icon skeleton"></div>
-                    </li>
-                    <li class="surah-card-skeleton">
+                    </div>
+                    <div class="surah-card-skeleton">
                         <div class="skeleton-number skeleton"></div>
                         <div class="skeleton-info">
                             <div class="skeleton-title skeleton"></div>
                             <div class="skeleton-text skeleton"></div>
                         </div>
                         <div class="skeleton-icon skeleton"></div>
-                    </li>
-                    <li class="surah-card-skeleton">
+                    </div>
+                    <div class="surah-card-skeleton">
                         <div class="skeleton-number skeleton"></div>
                         <div class="skeleton-info">
                             <div class="skeleton-title skeleton"></div>
                             <div class="skeleton-text skeleton"></div>
                         </div>
                         <div class="skeleton-icon skeleton"></div>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             </section>
 
             <!-- المساعد الذكي -->
@@ -232,11 +225,9 @@
                 </div>
                 <div class="chat-input-area">
                     <div class="chat-input-wrapper">
-                        <input type="text" id="ai-input" placeholder="اكتب سؤالك هنا..." autocomplete="off"
-                            aria-label="سؤالك للمساعد الذكي">
+                        <input type="text" id="ai-input" placeholder="اكتب سؤالك هنا..." autocomplete="off">
                     </div>
-                    <button id="send-ai-btn" disabled aria-label="إرسال السؤال"><i
-                            class="fas fa-arrow-left"></i></button>
+                    <button id="send-ai-btn" disabled><i class="fas fa-arrow-left"></i></button>
                 </div>
             </section>
 
@@ -299,11 +290,10 @@
             <!-- عن المطور - تصميم هادئ وراقي -->
             <section id="about-view" class="others-subview page-animate" style="display: none;">
                 <div class="view-header">
-                    <button class="back-btn" id="about-back" aria-label="العودة"><i
-                            class="fas fa-arrow-right"></i></button>
+                    <button class="back-btn" id="about-back"><i class="fas fa-arrow-right"></i></button>
                     <h2>عن المطور</h2>
                 </div>
-
+                
                 <div class="calm-dev-container">
                     <div class="dev-pearl-card">
                         <div class="dev-header-minimal">
@@ -315,8 +305,7 @@
                         </div>
 
                         <div class="dev-message-zen">
-                            <p>"الحمد لله الذي سخر لنا هذا لخدمة كتابه الكريم. أسعى لتقديم تجربة تقنية هادئة تعينكم على
-                                ذكر الله."</p>
+                            <p>"الحمد لله الذي سخر لنا هذا لخدمة كتابه الكريم. أسعى لتقديم تجربة تقنية هادئة تعينكم على ذكر الله."</p>
                         </div>
 
                         <div class="zen-action-links">
@@ -345,8 +334,7 @@
             <!-- دعاء اليوم -->
             <section id="dua-view" class="others-subview page-animate" style="display: none;">
                 <div class="view-header">
-                    <button class="back-btn" id="dua-back" aria-label="العودة"><i
-                            class="fas fa-arrow-right"></i></button>
+                    <button class="back-btn" id="dua-back"><i class="fas fa-arrow-right"></i></button>
                     <h2>دعاء اليوم</h2>
                 </div>
                 <div class="dua-container" id="dua-content-container">
@@ -359,8 +347,7 @@
             <!-- السبحة الإلكترونية -->
             <section id="rosary-view" class="others-subview page-animate" style="display: none;">
                 <div class="view-header">
-                    <button class="back-btn" id="rosary-back" aria-label="العودة"><i
-                            class="fas fa-arrow-right"></i></button>
+                    <button class="back-btn" id="rosary-back"><i class="fas fa-arrow-right"></i></button>
                     <h2>المسبحة الإلكترونية</h2>
                 </div>
                 <div class="rosary-container">
@@ -369,20 +356,19 @@
                         <span class="rosary-label">تسبيح</span>
                     </div>
                     <div class="rosary-body">
-                        <button id="rosary-increment-btn" class="rosary-btn" aria-label="زيادة التسبيح">
+                        <button id="rosary-increment-btn" class="rosary-btn">
                             <div class="rosary-inner-circle"></div>
                         </button>
                     </div>
-                    <button id="rosary-reset-btn" class="rosary-reset" title="تصفير العداد"
-                        aria-label="تصفير عداد التسبيح"><i class="fas fa-redo"></i></button>
+                    <button id="rosary-reset-btn" class="rosary-reset" title="تصفير العداد"><i
+                            class="fas fa-redo"></i></button>
                 </div>
             </section>
 
             <!-- مواقيت الصلاة -->
             <section id="prayer-view" class="others-subview page-animate" style="display: none;">
                 <div class="view-header">
-                    <button class="back-btn" id="prayer-back" aria-label="العودة"><i
-                            class="fas fa-arrow-right"></i></button>
+                    <button class="back-btn" id="prayer-back"><i class="fas fa-arrow-right"></i></button>
                     <h2>مواقيت الصلاة</h2>
                 </div>
                 <div class="prayer-container">
@@ -397,9 +383,9 @@
                         <span class="countdown-label">يبقي على أذان <span id="next-prayer-name">--</span></span>
                         <div class="countdown-timer" id="countdown-timer">00:00:00</div>
                     </div>
-                    <ul id="prayer-times-list" class="prayer-list" role="list">
-                        <li class="loader">جاري جلب القِبلة والمواقيت...</li>
-                    </ul>
+                    <div id="prayer-times-list" class="prayer-list">
+                        <div class="loader">جاري جلب القِبلة والمواقيت...</div>
+                    </div>
 
                 </div>
             </section>
@@ -408,8 +394,7 @@
             <!-- فيديوهات دينية -->
             <section id="videos-view" class="others-subview page-animate" style="display: none;">
                 <div class="view-header">
-                    <button class="back-btn" id="videos-back" aria-label="العودة"><i
-                            class="fas fa-arrow-right"></i></button>
+                    <button class="back-btn" id="videos-back"><i class="fas fa-arrow-right"></i></button>
                     <h2>فيديوهات دينية</h2>
                 </div>
                 <div class="videos-container">
@@ -419,9 +404,9 @@
                     </div>
 
                     <div id="videos-list" class="video-content-area active">
-                        <ul class="playlists-grid" id="individual-videos-grid" role="list">
+                        <div class="playlists-grid" id="individual-videos-grid">
                             <!-- الفيديوهات هتظهر هنا عشوائياً بالـ JS -->
-                        </ul>
+                        </div>
 
                         <!-- عارض الفيديو الفردي -->
                         <div id="single-video-player-view" style="display: none;">
@@ -431,7 +416,7 @@
                                 <h2 id="current-video-title">مشاهدة الفيديو</h2>
                             </div>
                             <div class="playlist-card">
-                                <iframe id="single-youtube-player" src="" title="مشغل فيديو ديني منفرد" frameborder="0"
+                                <iframe id="single-youtube-player" src="" title="YouTube video player" frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowfullscreen>
                                 </iframe>
@@ -516,8 +501,7 @@
                                 </button>
                             </div>
                             <div class="playlist-card">
-                                <iframe id="youtube-player" src="" title="مشغل قائمة تشغيل فيديوهات دينية"
-                                    frameborder="0"
+                                <iframe id="youtube-player" src="" title="YouTube video player" frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowfullscreen>
                                 </iframe>
@@ -532,7 +516,7 @@
             <div id="ayah-viewer" class="ayah-viewer">
                 <div class="ayah-header">
                     <h3 id="viewer-title">سورة الفاتحة</h3>
-                    <button id="close-viewer" aria-label="إغلاق القارئ"><i class="fas fa-times"></i></button>
+                    <button id="close-viewer"><i class="fas fa-times"></i></button>
                 </div>
                 <div id="ayah-content" class="ayah-content">
                 </div>
@@ -562,13 +546,11 @@
                         </div>
                     </div>
                     <div class="info-actions">
-                        <button id="download-btn" class="download-btn" title="تحميل السورة"
-                            aria-label="تحميل السورة للاستماع بدون إنترنت"><i
+                        <button id="download-btn" class="download-btn" title="تحميل السورة"><i
                                 class="fas fa-cloud-download-alt"></i></button>
-                        <button id="show-text-btn" class="text-btn" title="عرض الآيات" aria-label="عرض آيات السورة"><i
+                        <button id="show-text-btn" class="text-btn" title="عرض الآيات"><i
                                 class="fas fa-file-alt"></i></button>
-                        <button id="fav-btn" class="fav-btn" aria-label="إضافة للمفضلة"><i
-                                class="far fa-heart"></i></button>
+                        <button id="fav-btn" class="fav-btn"><i class="far fa-heart"></i></button>
                     </div>
                 </div>
 
@@ -576,15 +558,15 @@
                 <div class="player-controls">
                     <div class="progress-area">
                         <span id="current-time" class="time-label">00:00</span>
-                        <div class="progress-bar" role="progressbar" aria-label="شريط تقدم السورة" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="progress-bar">
                             <div id="progress-filled"></div>
                         </div>
                         <span id="duration" class="time-label">00:00</span>
                     </div>
                     <div class="buttons">
-                        <button id="prev-btn" aria-label="السورة السابقة"><i class="fas fa-step-backward"></i></button>
-                        <button id="play-btn" class="play-main" aria-label="تشغيل"><i class="fas fa-play"></i></button>
-                        <button id="next-btn" aria-label="السورة التالية"><i class="fas fa-step-forward"></i></button>
+                        <button id="prev-btn"><i class="fas fa-step-backward"></i></button>
+                        <button id="play-btn" class="play-main"><i class="fas fa-play"></i></button>
+                        <button id="next-btn"><i class="fas fa-step-forward"></i></button>
                     </div>
                 </div>
             </div>
@@ -592,25 +574,25 @@
         </footer>
 
         <!-- المنيو تحت -->
-        <nav class="sidebar" aria-label="التنقل الرئيسي">
+        <nav class="sidebar">
             <div class="nav-menu">
-                <button class="nav-item active" data-target="home" aria-current="page">
-                    <i class="fas fa-home" aria-hidden="true"></i>
+                <button class="nav-item active" data-target="home">
+                    <i class="fas fa-home"></i>
                     <span>الرئيسية</span>
                 </button>
                 <button class="nav-item" data-target="favorites">
-                    <i class="fas fa-heart" aria-hidden="true"></i>
+                    <i class="fas fa-heart"></i>
                     <span>المفضلة</span>
                 </button>
                 <button class="nav-item" data-target="ai">
-                    <div class="modern-ai-icon-container" aria-hidden="true">
+                    <div class="modern-ai-icon-container">
                         <div class="ai-icon-glow"></div>
                         <div class="ai-icon-sparkle"></div>
                     </div>
                     <span>المساعد</span>
                 </button>
                 <button class="nav-item" data-target="others">
-                    <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+                    <i class="fas fa-ellipsis-h"></i>
                     <span>أخرى</span>
                 </button>
             </div>
@@ -619,18 +601,18 @@
     </div>
 
     <!-- بانر تثبيت التطبيق PWA -->
-    <div id="pwa-install-banner" class="pwa-install-banner" style="display:none;" role="alert" aria-live="polite">
+    <div id="pwa-install-banner" class="pwa-install-banner" style="display:none;">
         <div class="pwa-install-content">
-            <div class="pwa-icon-wrap" aria-hidden="true">
-                <img src="images/icon-512x512.jpg" alt="" class="pwa-app-icon">
+            <div class="pwa-icon-wrap">
+                <img src="images/icon-512x512.jpg" alt="أيقونة قرآني" class="pwa-app-icon">
             </div>
             <div class="pwa-text">
-                <h3 id="pwa-title">ثبّت تطبيق قرآني</h3>
+                <h3>ثبّت تطبيق قرآني</h3>
                 <p>استمتع بتجربة أفضل واستمع للقرآن حتى بدون إنترنت</p>
             </div>
             <div class="pwa-actions">
-                <button id="pwa-install-btn" class="pwa-btn-install" aria-labelledby="pwa-title pwa-install-btn">
-                    <i class="fas fa-download" aria-hidden="true"></i>
+                <button id="pwa-install-btn" class="pwa-btn-install">
+                    <i class="fas fa-download"></i>
                     تثبيت
                 </button>
                 <button id="pwa-dismiss-btn" class="pwa-btn-dismiss">
@@ -641,9 +623,9 @@
     </div>
 
     <!-- تنبيه الصلاة على النبي -->
-    <div id="salawat-modal" class="modal salawat-modal" role="dialog" aria-modal="true" aria-labelledby="salawat-title">
+    <div id="salawat-modal" class="modal salawat-modal">
         <div class="modal-content salawat-content">
-            <div class="salawat-icon" id="salawat-icon-container" aria-hidden="true">
+            <div class="salawat-icon" id="salawat-icon-container">
                 <i class="fas fa-heart" id="salawat-icon"></i>
             </div>
             <h3 class="salawat-title" id="salawat-title">🤍صلى على اشرف الخلق🤍</h3>
@@ -653,7 +635,7 @@
     </div>
 
     <!-- نافذة اللغات -->
-    <div id="language-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="lang-modal-title">
+    <div id="language-modal" class="modal">
         <div class="modal-content language-modal-content">
             <h3 id="lang-modal-title">اختر اللغة / Language</h3>
             <div class="language-options">
@@ -691,13 +673,13 @@
     </div>
 
     <!-- مودال التفسير -->
-    <div id="tafsir-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="tafsir-title">
+    <div id="tafsir-modal" class="modal">
         <div class="modal-content tafsir-content">
             <div class="tafsir-header">
                 <div class="tafsir-header-main">
                     <h3 id="tafsir-title">تفسير الآية</h3>
                     <div class="tafsir-selector">
-                        <select id="tafsir-engine-select" aria-label="اختر كتاب التفسير">
+                        <select id="tafsir-engine-select">
                             <option value="ar.muyassar">تفسير الميسر</option>
                             <option value="ar.jalalayn">تفسير الجلالين</option>
                             <option value="ar.qurtubi">تفسير القرطبي</option>
@@ -707,7 +689,7 @@
                         </select>
                     </div>
                 </div>
-                <button id="close-tafsir" aria-label="إغلاق التفسير"><i class="fas fa-times"></i></button>
+                <button id="close-tafsir"><i class="fas fa-times"></i></button>
             </div>
             <div id="tafsir-body" class="tafsir-body">
                 <div class="loader">جاري تحميل التفسير...</div>
@@ -716,11 +698,11 @@
     </div>
 
     <!-- مودال كروت المشاركة -->
-    <div id="share-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="share-title">
+    <div id="share-modal" class="modal">
         <div class="modal-content share-content">
             <div class="view-header">
-                <button class="back-btn" id="close-share" aria-label="إغلاق"><i class="fas fa-times"></i></button>
-                <h2 id="share-title">مشاركة الآية</h2>
+                <button class="back-btn" id="close-share"><i class="fas fa-times"></i></button>
+                <h2>مشاركة الآية</h2>
             </div>
             <div class="share-preview-container">
                 <div id="share-card-preview" class="share-card-preview">
@@ -747,16 +729,15 @@
 
 
     <!-- مودال اختيار الحلقات -->
-    <div id="playlist-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="playlist-title">
+    <div id="playlist-modal" class="modal">
         <div class="modal-content playlist-modal-content">
             <div class="view-header">
-                <button class="back-btn" id="close-playlist-modal" aria-label="إغلاق"><i
-                        class="fas fa-times"></i></button>
-                <h2 id="playlist-title">اختر حلقة</h2>
+                <button class="back-btn" id="close-playlist-modal"><i class="fas fa-times"></i></button>
+                <h2>اختر حلقة</h2>
             </div>
-            <ul id="playlist-items-container" class="playlist-items-grid" role="list">
+            <div id="playlist-items-container" class="playlist-items-grid">
                 <!-- الحلقات هتظهر هنا بالـ JS -->
-            </ul>
+            </div>
         </div>
     </div>
 

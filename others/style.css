@@ -49,32 +49,6 @@ body {
     color: var(--text-light);
 }
 
-/* Skip link style for accessibility */
-.skip-link {
-    position: absolute;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary-color);
-    color: white;
-    padding: 10px 20px;
-    z-index: 10000;
-    text-decoration: none;
-    border-radius: 0 0 10px 10px;
-    transition: top 0.3s ease;
-    font-weight: bold;
-}
-
-.skip-link:focus {
-    top: 0;
-}
-
-/* Focus styles for keyboard navigation */
-:focus-visible {
-    outline: 3px solid var(--primary-color);
-    outline-offset: 3px;
-}
-
 body.dark-mode {
     background-color: transparent;
     color: var(--text-dark);
@@ -374,7 +348,7 @@ body.dark-mode .search-bar:focus-within {
 }
 
 .search-toggle-btn {
-    background: #138d75; /* Darker teal for better white text contrast (WCAG AA) */
+    background: var(--primary-color);
     color: white;
     padding: 6px 14px;
     border-radius: 12px;
@@ -392,8 +366,8 @@ body.dark-mode .search-bar:focus-within {
 }
 
 .search-toggle-btn.ayah {
-    background: #d35400; /* Darker orange for better white text contrast (WCAG AA) */
-    box-shadow: 0 4px 10px rgba(211, 84, 0, 0.2);
+    background: #e67e22;
+    box-shadow: 0 4px 10px rgba(230, 126, 34, 0.2);
 }
 
 /* الحتة اللي في النص اللي بيتعرض فيها كل حاجة */
