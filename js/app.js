@@ -2225,7 +2225,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function updateNavBtns() {
             prevBtn2.disabled = currentPage <= 1;
-            nextBtn2.disabled = currentPage + 1 >= TOTAL_PAGES;
+            nextBtn2.disabled = currentPage >= TOTAL_PAGES;
+        }
+
+        // هل الشاشة صغيرة ونعرض صفحة واحدة؟
+        function isSinglePage() {
+            return window.innerWidth <= 540;
         }
 
         /* --- الانتقال للصفحة --- */
@@ -2268,14 +2273,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target === modal) closeMushaf();
         });
 
-        // الصفحة السابقة (عربي: ← يعني صفحة أعلى في الترتيب)
+        // الصفحة السابقة
         prevBtn2.addEventListener('click', () => {
-            if (currentPage > 1) goToPage(currentPage - 2, 'prev');
+            const step = isSinglePage() ? 1 : 2;
+            if (currentPage > 1) goToPage(currentPage - step, 'prev');
         });
 
         // الصفحة التالية
         nextBtn2.addEventListener('click', () => {
-            if (currentPage + 1 < TOTAL_PAGES) goToPage(currentPage + 2, 'next');
+            const step = isSinglePage() ? 1 : 2;
+            if (currentPage < TOTAL_PAGES) goToPage(currentPage + step, 'next');
         });
 
         // الانتقال بإدخال رقم
