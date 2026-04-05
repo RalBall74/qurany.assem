@@ -512,16 +512,65 @@
             </section>
 
 
-            <!-- عرض الآيات -->
             <div id="ayah-viewer" class="ayah-viewer">
                 <div class="ayah-header">
                     <h3 id="viewer-title">سورة الفاتحة</h3>
-                    <button id="close-viewer"><i class="fas fa-times"></i></button>
+                    <div class="ayah-header-actions">
+                        <button id="open-mushaf-btn" title="عرض المصحف الرقمي 3D" class="mushaf-toggle-btn">
+                            <i class="fas fa-book-open"></i>
+                        </button>
+                        <button id="close-viewer"><i class="fas fa-times"></i></button>
+                    </div>
                 </div>
                 <div id="ayah-content" class="ayah-content">
                 </div>
             </div>
         </main>
+
+        <!-- مودال المصحف الرقمي 3D -->
+        <div id="mushaf-modal" class="mushaf-modal">
+            <div class="mushaf-modal-inner">
+                <!-- هيدر المودال -->
+                <div class="mushaf-modal-header">
+                    <div class="mushaf-nav-info">
+                        <span id="mushaf-page-label">صفحة <strong id="mushaf-current-page">1</strong> / 604</span>
+                    </div>
+                    <button id="close-mushaf-btn" class="mushaf-close-btn"><i class="fas fa-times"></i></button>
+                </div>
+
+                <!-- الكتاب الثلاثي الأبعاد -->
+                <div class="mushaf-book-wrapper">
+                    <div class="mushaf-book" id="mushaf-book">
+                        <!-- الصفحة اليمين -->
+                        <div class="mushaf-page mushaf-right" id="mushaf-right-page">
+                            <div class="page-glow"></div>
+                            <img id="mushaf-img-right" src="" alt="صفحة المصحف" loading="lazy" />
+                            <div class="page-spine-shadow"></div>
+                        </div>
+                        <!-- الصفحة الشمال -->
+                        <div class="mushaf-page mushaf-left" id="mushaf-left-page">
+                            <div class="page-glow"></div>
+                            <img id="mushaf-img-left" src="" alt="صفحة المصحف" loading="lazy" />
+                            <div class="page-spine-shadow left"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- أزرار التنقل -->
+                <div class="mushaf-controls">
+                    <button id="mushaf-prev" class="mushaf-ctrl-btn" title="الصفحة السابقة">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="mushaf-page-jump">
+                        <input type="number" id="mushaf-page-input" min="1" max="604" placeholder="رقم الصفحة" />
+                        <button id="mushaf-goto-btn">اذهب</button>
+                    </div>
+                    <button id="mushaf-next" class="mushaf-ctrl-btn" title="الصفحة التالية">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <!-- بار المشغل تحت -->
         <footer class="player-bar">

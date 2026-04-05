@@ -2148,4 +2148,180 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('Visualizer interaction or CORS error:', e);
         }
     }
+
+
+    /* المصحف الرقمي ثلاثي الأبعاد                                   */
+
+    (function initMushaf() {
+        const MUSHAF_IMG_BASE = 'https://www.mp3quran.net/mushaf2/';
+        const TOTAL_PAGES = 604;
+
+        // بيانات السور → صفحات (بتتحمل مرة وتتخزن)
+        let suwarPageMap = null; // [{ id, start_page }]
+
+        const modal          = document.getElementById('mushaf-modal');
+        const openBtn        = document.getElementById('open-mushaf-btn');
+        const closeBtn       = document.getElementById('close-mushaf-btn');
+        const imgRight       = document.getElementById('mushaf-img-right');
+        const imgLeft        = document.getElementById('mushaf-img-left');
+        const rightPage      = document.getElementById('mushaf-right-page');
+        const leftPage       = document.getElementById('mushaf-left-page');
+        const currentPageEl  = document.getElementById('mushaf-current-page');
+        const prevBtn2       = document.getElementById('mushaf-prev');
+        const nextBtn2       = document.getElementById('mushaf-next');
+        const pageInput      = document.getElementById('mushaf-page-input');
+        const gotoBtn        = document.getElementById('mushaf-goto-btn');
+
+        let currentPage = 1; // رقم الصفحة اليمين (الأعلى / الأولى في الزوج)
+        let isAnimating = false;
+
+        /* --- جلب خريطة السور → الصفحات --- */
+        async function fetchSuwarMap() {
+            if (suwarPageMap) return suwarPageMap;
+            try {
+                const resp = await fetch('https://mp3quran.net/api/v3/suwar');
+                const data = await resp.json();
+                suwarPageMap = data.suwar; // [{ id, start_page, ... }]
+            } catch (e) {
+                console.warn('[Mushaf] فشل جلب خريطة السور:', e);
+                suwarPageMap = [];
+            }
+            return suwarPageMap;
+        }
+
+        /* --- رابط صورة الصفحة --- */
+        function pageUrl(n) {
+            return `${MUSHAF_IMG_BASE}${n}.jpg`;
+        }
+
+        /* --- تحديث الصور والعنوان --- */
+        function renderPages(pageNum, direction = null, skipAnimation = false) {
+            const rightP = pageNum;
+            const leftP  = pageNum + 1;
+
+            if (direction && !skipAnimation) {
+                const cls = direction === 'next' ? 'flipping' : 'flipping';
+                const el  = direction === 'next' ? rightPage : leftPage;
+                el.classList.add(cls);
+                el.addEventListener('animationend', () => el.classList.remove(cls), { once: true });
+            }
+
+            // تحميل الصور
+            const newRight = new Image();
+            newRight.src = pageUrl(rightP);
+            newRight.onload = () => { imgRight.src = newRight.src; };
+            imgRight.src = pageUrl(rightP);
+
+            if (leftP <= TOTAL_PAGES) {
+                imgLeft.src = pageUrl(leftP);
+                leftPage.style.display = '';
+            } else {
+                leftPage.style.display = 'none';
+            }
+
+            currentPageEl.textContent = rightP;
+            updateNavBtns();
+        }
+
+        function updateNavBtns() {
+            prevBtn2.disabled = currentPage <= 1;
+            nextBtn2.disabled = currentPage + 1 >= TOTAL_PAGES;
+        }
+
+        /* --- الانتقال للصفحة --- */
+        function goToPage(n, direction = null) {
+            if (isAnimating) return;
+            n = Math.max(1, Math.min(TOTAL_PAGES - 1, n));
+            currentPage = n;
+            renderPages(n, direction);
+        }
+
+        /* --- فتح المصحف وتحديد سورة تلقائياً --- */
+        async function openMushaf() {
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+
+            // لو في سورة شغالة، افتح صفحتها
+            if (curIdx !== -1 && surahs[curIdx]) {
+                const surahNum = surahs[curIdx].number;
+                const map = await fetchSuwarMap();
+                const entry = map.find(s => s.id === surahNum);
+                if (entry && entry.start_page) {
+                    currentPage = entry.start_page;
+                }
+            }
+
+            renderPages(currentPage, null, true);
+        }
+
+        function closeMushaf() {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        /* --- أحداث الأزرار --- */
+        if (openBtn)  openBtn.addEventListener('click', openMushaf);
+        if (closeBtn) closeBtn.addEventListener('click', closeMushaf);
+
+        // إغلاق بالنقر خارج المودال
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeMushaf();
+        });
+
+        // الصفحة السابقة (عربي: ← يعني صفحة أعلى في الترتيب)
+        prevBtn2.addEventListener('click', () => {
+            if (currentPage > 1) goToPage(currentPage - 2, 'prev');
+        });
+
+        // الصفحة التالية
+        nextBtn2.addEventListener('click', () => {
+            if (currentPage + 1 < TOTAL_PAGES) goToPage(currentPage + 2, 'next');
+        });
+
+        // الانتقال بإدخال رقم
+        gotoBtn.addEventListener('click', () => {
+            const n = parseInt(pageInput.value);
+            if (n >= 1 && n <= TOTAL_PAGES) {
+                goToPage(n);
+                pageInput.value = '';
+            }
+        });
+
+        pageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') gotoBtn.click();
+        });
+
+        // تقليب بالسحب (Swipe) على الموبايل
+        let touchStartX = 0;
+        modal.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        modal.addEventListener('touchend', (e) => {
+            const dx = e.changedTouches[0].screenX - touchStartX;
+            if (Math.abs(dx) < 40) return;
+            if (dx < 0) nextBtn2.click(); // سحب يسار → صفحة تالية
+            else         prevBtn2.click(); // سحب يمين → صفحة سابقة
+        }, { passive: true });
+
+        // مفاتيح لوحة المفاتيح
+        document.addEventListener('keydown', (e) => {
+            if (!modal.classList.contains('open')) return;
+            if (e.key === 'ArrowLeft')  nextBtn2.click();
+            if (e.key === 'ArrowRight') prevBtn2.click();
+            if (e.key === 'Escape')     closeMushaf();
+        });
+
+        // تحميل مسبق للصفحات القادمة
+        function preloadNext(pageNum) {
+            [pageNum + 2, pageNum + 3].forEach(n => {
+                if (n <= TOTAL_PAGES) { const img = new Image(); img.src = pageUrl(n); }
+            });
+        }
+
+        nextBtn2.addEventListener('click', () => preloadNext(currentPage));
+        prevBtn2.addEventListener('click', () => preloadNext(Math.max(1, currentPage - 3)));
+
+    })();
+
 });
