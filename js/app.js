@@ -1459,11 +1459,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // 30 فريم في الثانية للفيديو
             let mediaStream = shareVideoCanvas.captureStream(30); 
             
-            // إضافة الصوت للـ MediaStream
+            // إضافة الصوت للـ MediaStream واستخراج داتا الموجات (Visualizer)
             let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             let dest = audioCtx.createMediaStreamDestination();
             let sourceNode = audioCtx.createMediaElementSource(audioNode);
-            sourceNode.connect(dest);
+            
+            let analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            sourceNode.connect(analyser);
+            analyser.connect(dest);
             sourceNode.connect(audioCtx.destination); // لكي يسمع المستخدم الصوت أيضاً
 
             // دمج الفيديو والصوت
@@ -1515,101 +1522,165 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1500);
             };
 
+            // تجهيز جزيئات (Particles) متطايرة للخلفية
+            let particles = [];
+            for(let i=0; i<50; i++) {
+                particles.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    size: Math.random() * 4 + 1,
+                    speedY: Math.random() * 1 + 0.5,
+                    opacity: Math.random() * 0.5 + 0.2
+                });
+            }
+
             // تشغيل الأنيميشن في الكانفاس
             let drawLoop;
             let time = 0;
             
             function drawCanvasFrame() {
-                // خلفية غامقة ليلية هادئة (Night sky gradient)
-                const grad = ctx.createLinearGradient(0, 0, 0, H);
-                grad.addColorStop(0, '#0f172a');
-                grad.addColorStop(1, '#1e293b');
+                analyser.getByteFrequencyData(dataArray);
+                let audioSum = dataArray.reduce((a,b)=>a+b, 0);
+                let audioAvg = audioSum / bufferLength; // 0 to ~255
+                let pulse = audioAvg / 255; // 0 to 1
+
+                // خلفية عميقة وروحانية تتغير مع الوقت والصوت مجسمة
+                const grad = ctx.createLinearGradient(0, Math.sin(time)*50, W, H + Math.cos(time)*50);
+                grad.addColorStop(0, '#020617'); // Dark slate
+                grad.addColorStop(0.5, '#0f172a'); 
+                grad.addColorStop(1, '#1e1b4b'); // Deep indigo
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, W, H);
 
-                // تأثيرات متلألئة (دائرية)
-                time += 0.02;
+                // رسم الجزيئات المتطايرة 
                 ctx.save();
-                ctx.globalAlpha = 0.4 + (Math.sin(time) * 0.1);
-                ctx.fillStyle = 'rgba(26, 188, 156, 0.15)';
-                ctx.beginPath();
-                ctx.arc(W/2, H/2, 400 + Math.cos(time)*50, 0, Math.PI*2);
-                ctx.fill();
+                particles.forEach(p => {
+                    p.y -= p.speedY + (pulse * 2); // تتأثر بسرعة الصوت
+                    if(p.y < 0) p.y = H;
+                    ctx.fillStyle = `rgba(26, 188, 156, ${p.opacity * (0.5 + pulse)})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                    ctx.fill();
+                });
                 ctx.restore();
 
-                // رسم الكارت الزجاجي 
+                time += 0.015;
+                
+                // توهج خلفي يعتمد على تردد القرآن
+                ctx.save();
+                ctx.globalAlpha = 0.3 + (pulse * 0.4);
+                let glowGrad = ctx.createRadialGradient(W/2, H/2, 200, W/2, H/2, 800 + (pulse*300));
+                glowGrad.addColorStop(0, 'rgba(45, 212, 191, 0.2)'); // Teal glow
+                glowGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = glowGrad;
+                ctx.fillRect(0, 0, W, H);
+                ctx.restore();
+
+                // رسم الكارت الزجاجي النقي
                 const cardPadding = 80;
                 const cardX = cardPadding;
-                const cardY = parseInt(H * 0.15);
+                const cardY = parseInt(H * 0.12);
                 const cardW = W - (cardPadding * 2);
-                const cardH = parseInt(H * 0.55);
+                const cardH = parseInt(H * 0.65);
                 
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-                ctx.shadowBlur = 40;
-                ctx.shadowOffsetY = 20;
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                ctx.shadowBlur = 60 + (pulse * 20);
+                ctx.shadowOffsetY = 30;
 
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                // زجاج شفاف
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
                 ctx.beginPath();
-                ctx.roundRect ? ctx.roundRect(cardX, cardY, cardW, cardH, 50) : ctx.fillRect(cardX, cardY, cardW, cardH);
+                ctx.roundRect ? ctx.roundRect(cardX, cardY, cardW, cardH, 60) : ctx.fillRect(cardX, cardY, cardW, cardH);
                 ctx.fill();
 
+                // حدود الكارت الذهبية/الفضية الخفيفة
                 ctx.shadowBlur = 0;
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
                 ctx.lineWidth = 2;
+                let borderGrad = ctx.createLinearGradient(cardX, cardY, cardX+cardW, cardY+cardH);
+                borderGrad.addColorStop(0, 'rgba(255,255,255,0.4)');
+                borderGrad.addColorStop(0.5, 'rgba(255,255,255,0.05)');
+                borderGrad.addColorStop(1, 'rgba(255,255,255,0.2)');
+                ctx.strokeStyle = borderGrad;
                 ctx.stroke();
 
-                // الـ Logo
-                const logoSize = 120;
-                const brandY = cardY + 140;
+                // Visualizer (دوائر حول اللوجو)
+                const logoSize = 140;
+                const brandY = cardY + 160;
+
+                ctx.save();
+                ctx.translate(W/2, brandY);
+                for(let i=0; i<bufferLength; i+=3) { // ناخد شوية نقط مش كلهم عشان الشكل
+                    let barHeight = (dataArray[i] / 255) * 80;
+                    let angle = (i / bufferLength) * Math.PI * 2;
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(0, logoSize/2 + 10);
+                    ctx.lineTo(0, logoSize/2 + 10 + barHeight);
+                    // لون الموجة ذهبي ومائل للأخضر
+                    ctx.strokeStyle = `rgba(251, 191, 36, ${0.4 + pulse})`; 
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                    ctx.rotate(-angle);
+                }
+                ctx.restore();
+
+                // رسم اللوجو
                 ctx.save();
                 ctx.beginPath();
                 ctx.arc(W/2, brandY, logoSize/2, 0, Math.PI*2);
                 ctx.clip();
                 ctx.drawImage(logo, W/2 - logoSize/2, brandY - logoSize/2, logoSize, logoSize);
+                // تظليل اللوجو حوافه
+                ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                ctx.shadowBlur = 20 * pulse;
+                ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                ctx.lineWidth = 4;
+                ctx.stroke();
                 ctx.restore();
 
-                // التكست 
-                ctx.fillStyle = '#f1f5f9';
+                // كتابة الآية بنسق قرآني مبهر
+                ctx.fillStyle = '#ffffff';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
-                // كتابة الآية
-                let fontSize = 70;
+                let fontSize = 75;
                 let lines = [];
-                const textMaxWidth = cardW - 100;
+                const textMaxWidth = cardW - 120;
                 const ayahSpaceTop = brandY + 150;
-                const ayahSpaceBottom = cardY + cardH - 150;
+                const ayahSpaceBottom = cardY + cardH - 180;
                 
-                while(fontSize >= 30) {
+                while(fontSize >= 35) {
                     ctx.font = `700 ${fontSize}px Amiri, serif`;
                     lines = getWrappedLines(ctx, data.text, textMaxWidth);
-                    if (lines.length * (fontSize * 2.2) <= (ayahSpaceBottom - ayahSpaceTop)) break;
-                    fontSize -= 4;
+                    if (lines.length * (fontSize * 2.3) <= (ayahSpaceBottom - ayahSpaceTop)) break;
+                    fontSize -= 3;
                 }
 
-                let startLineY = ayahSpaceTop + ((ayahSpaceBottom - ayahSpaceTop)/2) - ((lines.length * fontSize * 2.2)/2) + (fontSize * 1.1);
+                let startLineY = ayahSpaceTop + ((ayahSpaceBottom - ayahSpaceTop)/2) - ((lines.length * fontSize * 2.3)/2) + (fontSize * 1.15);
                 
                 ctx.direction = 'rtl';
-                ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetY = 5;
                 lines.forEach((line, i) => {
-                    ctx.fillText(line.trim(), W/2, startLineY + (i*fontSize*2.2));
+                    ctx.fillText(line.trim(), W/2, startLineY + (i*fontSize*2.3));
                 });
                 
-                ctx.shadowBlur = 0;
                 ctx.direction = 'inherit';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetY = 0;
 
-                // اسم السورة
-                ctx.fillStyle = 'var(--primary-color)';
-                ctx.fillStyle = '#1abc9c';
-                ctx.font = '800 45px Amiri, serif';
+                // اسم السورة (ذهبي أنيق)
+                ctx.fillStyle = '#fcd34d'; // Amber/Gold
+                ctx.font = '800 48px Amiri, serif';
                 let surahNameStr = data.surah || data.surahStr || '';
                 let cleanSurah = surahNameStr.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
                 let ayahNumberSafe = data.ayah || data.ayahNum || '';
-                ctx.fillText(`سورة ${cleanSurah} • آية ${ayahNumberSafe}`, W / 2, cardY + cardH - 80);
+                ctx.fillText(`سورة ${cleanSurah} ✦ آية ${ayahNumberSafe}`, W / 2, cardY + cardH - 100);
 
-                // الشريط السفلي (معلومات)
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                // الشريط السفلي (معلومات التطبيق) متجاوب مع الصوت
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + pulse*0.3})`;
                 ctx.font = '500 36px Outfit, sans-serif';
                 ctx.fillText('ralball74.github.io/qurany.assem', W / 2, H - 120);
 
