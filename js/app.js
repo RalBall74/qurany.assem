@@ -1501,6 +1501,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 videoProgressBar.style.width = '100%';
                 videoProgressText.textContent = t('تم التسجيل! جاري الحفظ...');
                 
+                if (chunks.length === 0) {
+                    console.error('No video data chunks captured.');
+                    videoProgressText.textContent = t('فشل في التقاط بيانات الفيديو!');
+                    setTimeout(() => { videoProgressModal.style.display = 'none'; }, 2000);
+                    return;
+                }
+
                 const blob = new Blob(chunks, { type: 'video/webm' });
                 const url = URL.createObjectURL(blob);
                 
@@ -1698,16 +1705,44 @@ document.addEventListener('DOMContentLoaded', () => {
             // بدء العمليه
             drawLoop = requestAnimationFrame(drawCanvasFrame);
             
-            audioNode.oncanplaythrough = async () => {
+            let recordingStarted = false;
+            const startRecording = async () => {
+                if (recordingStarted) return;
                 if(recorder.state === 'inactive') {
-                    if (audioCtx.state === 'suspended') await audioCtx.resume();
-                    recorder.start();
-                    audioNode.play();
+                    try {
+                        recordingStarted = true;
+                        if (audioCtx.state === 'suspended') await audioCtx.resume();
+                        // نطلب الداتا كل ثانية لضمان أن الـ chunks مش فاضية
+                        recorder.start(1000); 
+                        audioNode.play();
+                        console.log('Recording started...');
+                    } catch (err) {
+                        console.error('Start recording error:', err);
+                        videoProgressText.textContent = t('خطأ أثناء بدء التسجيل!');
+                    }
                 }
             };
 
+            // لو الملف صغير جداً أو متحمل كاش، ممكن oncanplaythrough ما تشتغلش أو تشتغل فوري
+            if (audioNode.readyState >= 3) {
+                setTimeout(startRecording, 500);
+            } else {
+                audioNode.oncanplaythrough = startRecording;
+                // Failsafe: لو مأشتغلش بعد 5 ثواني
+                setTimeout(startRecording, 5000);
+            }
+
             audioNode.onended = () => {
-                if(recorder.state === 'recording') recorder.stop();
+                console.log('Audio ended, stopping recorder.');
+                if(recorder.state === 'recording') {
+                    recorder.stop();
+                }
+            };
+
+            audioNode.onerror = (e) => {
+                console.error('Audio node error:', e);
+                videoProgressText.textContent = t('خطأ في ملف الصوت!');
+                setTimeout(() => { videoProgressModal.style.display = 'none'; }, 2000);
             };
         }
 
