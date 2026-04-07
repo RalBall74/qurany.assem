@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTafsirEdition = localStorage.getItem('quran_tafsir_edition') || 'ar.muyassar';
     let activeTafsirAyah = null;
     let activeTafsirSurah = null;
+    let currentShareData = null; // To store data for video sharing
     let prayersTimings = null;
     let notificationPreferences = { prayer: false };
     let readingObserver = null;
@@ -105,6 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let playerManuallyMaximized = false;
     let audioContext, analyser, audioSource, visualizerAnimationId;
     let isFocusMode = false;
+
+    // Video Share Elements
+    const shareVideoCanvas = document.getElementById('share-video-canvas');
+    const downloadVideoBtn = document.getElementById('download-video-btn');
+    const videoProgressModal = document.getElementById('video-progress-modal');
+    const videoProgressBar = document.getElementById('video-progress-bar');
+    const videoProgressText = document.getElementById('video-progress-text');
 
 
     const innahuRabbiPlaylist = [
@@ -747,7 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="ayah-row">
                                 <span class="ayah-txt" id="ayah-${a.numberInSurah}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">${a.text} <span class="ayah-num">(${a.numberInSurah})</span></span>
                                 <div class="ayah-actions">
-                                    <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة" data-surah="${surah.name.replace('سورة ', '')}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
+                                    <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة/فيديو" data-surah="${surah.name.replace('سورة ', '')}" data-surah-num="${surah.number}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
                                         <i class="fas fa-camera"></i>
                                     </div>
                                 </div>
@@ -1301,7 +1309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="ayah-row">
                         <span class="ayah-txt" id="ayah-${a.numberInSurah}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">${a.text} <span class="ayah-num">(${a.numberInSurah})</span></span>
                         <div class="ayah-actions">
-                            <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة" data-surah="${surah.name.replace('سورة ', '')}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
+                            <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة/فيديو" data-surah="${surah.name.replace('سورة ', '')}" data-surah-num="${surah.number}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
                                 <i class="fas fa-camera"></i>
                             </div>
                         </div>
@@ -1358,9 +1366,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.stopPropagation(); // عشان ما يفتحش التفسير بالصدفة
                 const data = {
                     surah: shareBtn.dataset.surah,
+                    surahNum: shareBtn.dataset.surahNum,
                     ayah: shareBtn.dataset.ayah,
                     text: shareBtn.dataset.text
                 };
+                currentShareData = data;
                 generateAyahCard(data);
             }
         });
@@ -1397,6 +1407,238 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(t('المشاركة غير مدعومة في متصفحك، يمكنك حفظ الصورة بدلاً من ذلك.'));
             }
         });
+
+        // ----------------------------------------------------
+        // توليد الفيديو ਰيلز (Video Reels Generation)
+        // ----------------------------------------------------
+        if (downloadVideoBtn) {
+            downloadVideoBtn.addEventListener('click', () => {
+                if (!currentShareData) return;
+                generateAyahVideo(currentShareData);
+            });
+        }
+
+        async function generateAyahVideo(data) {
+            shareModal.style.display = 'none'; // نخفي كارت الصورة
+            videoProgressModal.style.display = 'flex'; // نظهر مودال تقدم الفيديو
+            videoProgressBar.style.width = '0%';
+            videoProgressText.textContent = t('جاري تهيئة الفيديو...');
+
+            const ctx = shareVideoCanvas.getContext('2d', { alpha: false });
+            const W = shareVideoCanvas.width;
+            const H = shareVideoCanvas.height;
+
+            // 1. تحميل الصورة (كإعداد مبدئي)
+            let logo = new Image();
+            logo.src = 'images/icon-512x512.jpg';
+            await new Promise(res => { logo.onload = res; logo.onerror = res; });
+
+            videoProgressBar.style.width = '20%';
+            videoProgressText.textContent = t('جاري جلب ملف الصوت...');
+
+            // 2. جلب صوت الآية المحددة بصوت مشاري العفاسي
+            // نستخدم سيرفر EveryAyah لكونه مستقر جداً ويدعم CORS للـ Canvas
+            const sNum = String(data.surahNum).padStart(3, '0');
+            const aNum = String(data.ayah || data.ayahNum).padStart(3, '0');
+            const audioUrl = `https://everyayah.com/data/Alafasy_128kbps/${sNum}${aNum}.mp3`;
+            
+            let audioNode = new Audio();
+            audioNode.crossOrigin = 'anonymous';
+            audioNode.src = audioUrl;
+
+            // التأكد من استجابة الصوت
+            audioNode.onerror = () => {
+                videoProgressText.textContent = t('فشل تحميل هذا المقطع الصوتي!');
+                setTimeout(() => { videoProgressModal.style.display = 'none'; }, 2000);
+            };
+
+            videoProgressBar.style.width = '40%';
+            videoProgressText.textContent = t('جاري تسجيل المشهد...');
+
+            // 3. إعداد تسجيل الفيديو من الـ Canvas
+            // 30 فريم في الثانية للفيديو
+            let mediaStream = shareVideoCanvas.captureStream(30); 
+            
+            // إضافة الصوت للـ MediaStream
+            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let dest = audioCtx.createMediaStreamDestination();
+            let sourceNode = audioCtx.createMediaElementSource(audioNode);
+            sourceNode.connect(dest);
+            sourceNode.connect(audioCtx.destination); // لكي يسمع المستخدم الصوت أيضاً
+
+            // دمج الفيديو والصوت
+            let combinedStream = new MediaStream([
+                ...mediaStream.getVideoTracks(),
+                ...dest.stream.getAudioTracks()
+            ]);
+
+            let recorder;
+            try {
+                // استخدام صيغة مدعومة
+                let options = { mimeType: 'video/webm; codecs=vp9' };
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                    options = { mimeType: 'video/webm; codecs=vp8' };
+                }
+                recorder = new MediaRecorder(combinedStream, options);
+            } catch (e) {
+                recorder = new MediaRecorder(combinedStream);
+            }
+
+            let chunks = [];
+            recorder.ondataavailable = e => {
+                if (e.data && e.data.size > 0) chunks.push(e.data);
+            };
+
+            recorder.onstop = () => {
+                cancelAnimationFrame(drawLoop);
+                videoProgressBar.style.width = '100%';
+                videoProgressText.textContent = t('تم التسجيل! جاري الحفظ...');
+                
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                
+                // تحميل الفيديو للمستخدم
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `qurany-reel-${data.surahNum}-${data.ayah}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    videoProgressModal.style.display = 'none';
+                    audioNode.pause();
+                    audioNode.src = '';
+                    sourceNode.disconnect();
+                }, 1500);
+            };
+
+            // تشغيل الأنيميشن في الكانفاس
+            let drawLoop;
+            let time = 0;
+            
+            function drawCanvasFrame() {
+                // خلفية غامقة ليلية هادئة (Night sky gradient)
+                const grad = ctx.createLinearGradient(0, 0, 0, H);
+                grad.addColorStop(0, '#0f172a');
+                grad.addColorStop(1, '#1e293b');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, W, H);
+
+                // تأثيرات متلألئة (دائرية)
+                time += 0.02;
+                ctx.save();
+                ctx.globalAlpha = 0.4 + (Math.sin(time) * 0.1);
+                ctx.fillStyle = 'rgba(26, 188, 156, 0.15)';
+                ctx.beginPath();
+                ctx.arc(W/2, H/2, 400 + Math.cos(time)*50, 0, Math.PI*2);
+                ctx.fill();
+                ctx.restore();
+
+                // رسم الكارت الزجاجي 
+                const cardPadding = 80;
+                const cardX = cardPadding;
+                const cardY = parseInt(H * 0.15);
+                const cardW = W - (cardPadding * 2);
+                const cardH = parseInt(H * 0.55);
+                
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                ctx.shadowBlur = 40;
+                ctx.shadowOffsetY = 20;
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                ctx.beginPath();
+                ctx.roundRect ? ctx.roundRect(cardX, cardY, cardW, cardH, 50) : ctx.fillRect(cardX, cardY, cardW, cardH);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // الـ Logo
+                const logoSize = 120;
+                const brandY = cardY + 140;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(W/2, brandY, logoSize/2, 0, Math.PI*2);
+                ctx.clip();
+                ctx.drawImage(logo, W/2 - logoSize/2, brandY - logoSize/2, logoSize, logoSize);
+                ctx.restore();
+
+                // التكست 
+                ctx.fillStyle = '#f1f5f9';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // كتابة الآية
+                let fontSize = 70;
+                let lines = [];
+                const textMaxWidth = cardW - 100;
+                const ayahSpaceTop = brandY + 150;
+                const ayahSpaceBottom = cardY + cardH - 150;
+                
+                while(fontSize >= 30) {
+                    ctx.font = `700 ${fontSize}px Amiri, serif`;
+                    lines = getWrappedLines(ctx, data.text, textMaxWidth);
+                    if (lines.length * (fontSize * 2.2) <= (ayahSpaceBottom - ayahSpaceTop)) break;
+                    fontSize -= 4;
+                }
+
+                let startLineY = ayahSpaceTop + ((ayahSpaceBottom - ayahSpaceTop)/2) - ((lines.length * fontSize * 2.2)/2) + (fontSize * 1.1);
+                
+                ctx.direction = 'rtl';
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 10;
+                lines.forEach((line, i) => {
+                    ctx.fillText(line.trim(), W/2, startLineY + (i*fontSize*2.2));
+                });
+                
+                ctx.shadowBlur = 0;
+                ctx.direction = 'inherit';
+
+                // اسم السورة
+                ctx.fillStyle = 'var(--primary-color)';
+                ctx.fillStyle = '#1abc9c';
+                ctx.font = '800 45px Amiri, serif';
+                let surahNameStr = data.surah || data.surahStr || '';
+                let cleanSurah = surahNameStr.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
+                let ayahNumberSafe = data.ayah || data.ayahNum || '';
+                ctx.fillText(`سورة ${cleanSurah} • آية ${ayahNumberSafe}`, W / 2, cardY + cardH - 80);
+
+                // الشريط السفلي (معلومات)
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.font = '500 36px Outfit, sans-serif';
+                ctx.fillText('ralball74.github.io/qurany.assem', W / 2, H - 120);
+
+                drawLoop = requestAnimationFrame(drawCanvasFrame);
+            }
+
+            // تحديث شريط التقدم بسلاسة بناءا على وقت الصوت
+            audioNode.addEventListener('timeupdate', () => {
+                if(audioNode.duration) {
+                    let p = (audioNode.currentTime / audioNode.duration) * 60; // Progress visually goes 40% to 100%
+                    videoProgressBar.style.width = (40 + p) + '%';
+                }
+            });
+
+            // بدء العمليه
+            drawLoop = requestAnimationFrame(drawCanvasFrame);
+            
+            audioNode.oncanplaythrough = async () => {
+                if(recorder.state === 'inactive') {
+                    if (audioCtx.state === 'suspended') await audioCtx.resume();
+                    recorder.start();
+                    audioNode.play();
+                }
+            };
+
+            audioNode.onended = () => {
+                if(recorder.state === 'recording') recorder.stop();
+            };
+        }
 
         langBtn.addEventListener('click', () => {
             languageModal.style.display = 'flex';
@@ -1970,8 +2212,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // 5. اسم السورة والآية (Metadata)
         ctx.fillStyle = 'rgba(26, 188, 156, 1)';
         ctx.font = '800 42px Amiri, serif';
-        let cleanSurah = data.surah.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
-        ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, cardY + cardH - 120);
+        let surahNameStr = data.surah || data.surahStr || '';
+        let cleanSurah = surahNameStr.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
+        let ayahNumberSafe = data.ayah || data.ayahNum || '';
+        ctx.fillText(`سورة ${cleanSurah} • آية ${ayahNumberSafe}`, W / 2, cardY + cardH - 120);
 
         // 6. الحقوق في الأسفل (Footer)
         // ctx.fillStyle = '#64748b';
