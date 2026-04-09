@@ -98,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTafsirEdition = localStorage.getItem('quran_tafsir_edition') || 'ar.muyassar';
     let activeTafsirAyah = null;
     let activeTafsirSurah = null;
-    let currentShareData = null; // To store data for video sharing
     let prayersTimings = null;
     let notificationPreferences = { prayer: false };
     let readingObserver = null;
@@ -106,13 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let playerManuallyMaximized = false;
     let audioContext, analyser, audioSource, visualizerAnimationId;
     let isFocusMode = false;
-
-    // Video Share Elements
-    const shareVideoCanvas = document.getElementById('share-video-canvas');
-    const downloadVideoBtn = document.getElementById('download-video-btn');
-    const videoProgressModal = document.getElementById('video-progress-modal');
-    const videoProgressBar = document.getElementById('video-progress-bar');
-    const videoProgressText = document.getElementById('video-progress-text');
 
 
     const innahuRabbiPlaylist = [
@@ -755,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="ayah-row">
                                 <span class="ayah-txt" id="ayah-${a.numberInSurah}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">${a.text} <span class="ayah-num">(${a.numberInSurah})</span></span>
                                 <div class="ayah-actions">
-                                    <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة/فيديو" data-surah="${surah.name.replace('سورة ', '')}" data-surah-num="${surah.number}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
+                                    <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة" data-surah="${surah.name.replace('سورة ', '')}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
                                         <i class="fas fa-camera"></i>
                                     </div>
                                 </div>
@@ -1309,7 +1301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="ayah-row">
                         <span class="ayah-txt" id="ayah-${a.numberInSurah}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">${a.text} <span class="ayah-num">(${a.numberInSurah})</span></span>
                         <div class="ayah-actions">
-                            <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة/فيديو" data-surah="${surah.name.replace('سورة ', '')}" data-surah-num="${surah.number}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
+                            <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة" data-surah="${surah.name.replace('سورة ', '')}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
                                 <i class="fas fa-camera"></i>
                             </div>
                         </div>
@@ -1366,11 +1358,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.stopPropagation(); // عشان ما يفتحش التفسير بالصدفة
                 const data = {
                     surah: shareBtn.dataset.surah,
-                    surahNum: shareBtn.dataset.surahNum,
                     ayah: shareBtn.dataset.ayah,
                     text: shareBtn.dataset.text
                 };
-                currentShareData = data;
                 generateAyahCard(data);
             }
         });
@@ -1407,344 +1397,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(t('المشاركة غير مدعومة في متصفحك، يمكنك حفظ الصورة بدلاً من ذلك.'));
             }
         });
-
-        // ----------------------------------------------------
-        // توليد الفيديو ਰيلز (Video Reels Generation)
-        // ----------------------------------------------------
-        if (downloadVideoBtn) {
-            downloadVideoBtn.addEventListener('click', () => {
-                if (!currentShareData) return;
-                generateAyahVideo(currentShareData);
-            });
-        }
-
-        async function generateAyahVideo(data) {
-            shareModal.style.display = 'none'; // نخفي كارت الصورة
-            videoProgressModal.style.display = 'flex'; // نظهر مودال تقدم الفيديو
-            videoProgressBar.style.width = '0%';
-            videoProgressText.textContent = t('جاري تهيئة الفيديو...');
-
-            const ctx = shareVideoCanvas.getContext('2d', { alpha: false });
-            const W = shareVideoCanvas.width;
-            const H = shareVideoCanvas.height;
-
-            // 1. تحميل الصورة (كإعداد مبدئي)
-            let logo = new Image();
-            logo.src = 'images/icon-512x512.jpg';
-            await new Promise(res => { logo.onload = res; logo.onerror = res; });
-
-            videoProgressBar.style.width = '20%';
-            videoProgressText.textContent = t('جاري جلب ملف الصوت...');
-
-            // 2. جلب صوت الآية المحددة بصوت مشاري العفاسي
-            // نستخدم سيرفر EveryAyah لكونه مستقر جداً ويدعم CORS للـ Canvas
-            const sNum = String(data.surahNum).padStart(3, '0');
-            const aNum = String(data.ayah || data.ayahNum).padStart(3, '0');
-            const audioUrl = `https://everyayah.com/data/Alafasy_128kbps/${sNum}${aNum}.mp3`;
-            
-            let audioNode = new Audio();
-            audioNode.crossOrigin = 'anonymous';
-            audioNode.src = audioUrl;
-
-            // التأكد من استجابة الصوت
-            audioNode.onerror = () => {
-                videoProgressText.textContent = t('فشل تحميل هذا المقطع الصوتي!');
-                setTimeout(() => { videoProgressModal.style.display = 'none'; }, 2000);
-            };
-
-            videoProgressBar.style.width = '40%';
-            videoProgressText.textContent = t('جاري تسجيل المشهد...');
-
-            // 3. إعداد تسجيل الفيديو من الـ Canvas
-            // 30 فريم في الثانية للفيديو
-            let mediaStream = shareVideoCanvas.captureStream(30); 
-            
-            // إضافة الصوت للـ MediaStream واستخراج داتا الموجات (Visualizer)
-            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            let dest = audioCtx.createMediaStreamDestination();
-            let sourceNode = audioCtx.createMediaElementSource(audioNode);
-            
-            let analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-
-            sourceNode.connect(analyser);
-            analyser.connect(dest);
-            sourceNode.connect(audioCtx.destination); // لكي يسمع المستخدم الصوت أيضاً
-
-            // دمج الفيديو والصوت
-            let combinedStream = new MediaStream([
-                ...mediaStream.getVideoTracks(),
-                ...dest.stream.getAudioTracks()
-            ]);
-
-            let recorder;
-            try {
-                // استخدام صيغة مدعومة
-                let options = { mimeType: 'video/webm; codecs=vp9' };
-                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                    options = { mimeType: 'video/webm; codecs=vp8' };
-                }
-                recorder = new MediaRecorder(combinedStream, options);
-            } catch (e) {
-                recorder = new MediaRecorder(combinedStream);
-            }
-
-            let chunks = [];
-            recorder.ondataavailable = e => {
-                if (e.data && e.data.size > 0) chunks.push(e.data);
-            };
-
-            recorder.onstop = () => {
-                cancelAnimationFrame(drawLoop);
-                videoProgressBar.style.width = '100%';
-                videoProgressText.textContent = t('تم التسجيل! جاري الحفظ...');
-                
-                if (chunks.length === 0) {
-                    console.error('No video data chunks captured.');
-                    videoProgressText.textContent = t('فشل في التقاط بيانات الفيديو!');
-                    setTimeout(() => { videoProgressModal.style.display = 'none'; }, 2000);
-                    return;
-                }
-
-                const blob = new Blob(chunks, { type: 'video/webm' });
-                const url = URL.createObjectURL(blob);
-                
-                // تحميل الفيديو للمستخدم
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = `qurany-reel-${data.surahNum}-${data.ayah}.webm`;
-                document.body.appendChild(a);
-                a.click();
-                
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    videoProgressModal.style.display = 'none';
-                    audioNode.pause();
-                    audioNode.src = '';
-                    sourceNode.disconnect();
-                }, 1500);
-            };
-
-            // تجهيز جزيئات (Particles) متطايرة للخلفية
-            let particles = [];
-            for(let i=0; i<50; i++) {
-                particles.push({
-                    x: Math.random() * W,
-                    y: Math.random() * H,
-                    size: Math.random() * 4 + 1,
-                    speedY: Math.random() * 1 + 0.5,
-                    opacity: Math.random() * 0.5 + 0.2
-                });
-            }
-
-            // تشغيل الأنيميشن في الكانفاس
-            let drawLoop;
-            let time = 0;
-            
-            function drawCanvasFrame() {
-                analyser.getByteFrequencyData(dataArray);
-                let audioSum = dataArray.reduce((a,b)=>a+b, 0);
-                let audioAvg = audioSum / bufferLength; // 0 to ~255
-                let pulse = audioAvg / 255; // 0 to 1
-
-                // خلفية عميقة وروحانية تتغير مع الوقت والصوت مجسمة
-                const grad = ctx.createLinearGradient(0, Math.sin(time)*50, W, H + Math.cos(time)*50);
-                grad.addColorStop(0, '#020617'); // Dark slate
-                grad.addColorStop(0.5, '#0f172a'); 
-                grad.addColorStop(1, '#1e1b4b'); // Deep indigo
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, W, H);
-
-                // رسم الجزيئات المتطايرة 
-                ctx.save();
-                particles.forEach(p => {
-                    p.y -= p.speedY + (pulse * 2); // تتأثر بسرعة الصوت
-                    if(p.y < 0) p.y = H;
-                    ctx.fillStyle = `rgba(26, 188, 156, ${p.opacity * (0.5 + pulse)})`;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-                    ctx.fill();
-                });
-                ctx.restore();
-
-                time += 0.015;
-                
-                // توهج خلفي يعتمد على تردد القرآن
-                ctx.save();
-                ctx.globalAlpha = 0.3 + (pulse * 0.4);
-                let glowGrad = ctx.createRadialGradient(W/2, H/2, 200, W/2, H/2, 800 + (pulse*300));
-                glowGrad.addColorStop(0, 'rgba(45, 212, 191, 0.2)'); // Teal glow
-                glowGrad.addColorStop(1, 'transparent');
-                ctx.fillStyle = glowGrad;
-                ctx.fillRect(0, 0, W, H);
-                ctx.restore();
-
-                // رسم الكارت الزجاجي النقي
-                const cardPadding = 80;
-                const cardX = cardPadding;
-                const cardY = parseInt(H * 0.12);
-                const cardW = W - (cardPadding * 2);
-                const cardH = parseInt(H * 0.65);
-                
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-                ctx.shadowBlur = 60 + (pulse * 20);
-                ctx.shadowOffsetY = 30;
-
-                // زجاج شفاف
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
-                ctx.beginPath();
-                ctx.roundRect ? ctx.roundRect(cardX, cardY, cardW, cardH, 60) : ctx.fillRect(cardX, cardY, cardW, cardH);
-                ctx.fill();
-
-                // حدود الكارت الذهبية/الفضية الخفيفة
-                ctx.shadowBlur = 0;
-                ctx.lineWidth = 2;
-                let borderGrad = ctx.createLinearGradient(cardX, cardY, cardX+cardW, cardY+cardH);
-                borderGrad.addColorStop(0, 'rgba(255,255,255,0.4)');
-                borderGrad.addColorStop(0.5, 'rgba(255,255,255,0.05)');
-                borderGrad.addColorStop(1, 'rgba(255,255,255,0.2)');
-                ctx.strokeStyle = borderGrad;
-                ctx.stroke();
-
-                // Visualizer (دوائر حول اللوجو)
-                const logoSize = 140;
-                const brandY = cardY + 160;
-
-                ctx.save();
-                ctx.translate(W/2, brandY);
-                for(let i=0; i<bufferLength; i+=3) { // ناخد شوية نقط مش كلهم عشان الشكل
-                    let barHeight = (dataArray[i] / 255) * 80;
-                    let angle = (i / bufferLength) * Math.PI * 2;
-                    ctx.rotate(angle);
-                    ctx.beginPath();
-                    ctx.moveTo(0, logoSize/2 + 10);
-                    ctx.lineTo(0, logoSize/2 + 10 + barHeight);
-                    // لون الموجة ذهبي ومائل للأخضر
-                    ctx.strokeStyle = `rgba(251, 191, 36, ${0.4 + pulse})`; 
-                    ctx.lineWidth = 4;
-                    ctx.lineCap = 'round';
-                    ctx.stroke();
-                    ctx.rotate(-angle);
-                }
-                ctx.restore();
-
-                // رسم اللوجو
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(W/2, brandY, logoSize/2, 0, Math.PI*2);
-                ctx.clip();
-                ctx.drawImage(logo, W/2 - logoSize/2, brandY - logoSize/2, logoSize, logoSize);
-                // تظليل اللوجو حوافه
-                ctx.shadowColor = 'rgba(255,255,255,0.5)';
-                ctx.shadowBlur = 20 * pulse;
-                ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-                ctx.lineWidth = 4;
-                ctx.stroke();
-                ctx.restore();
-
-                // كتابة الآية بنسق قرآني مبهر
-                ctx.fillStyle = '#ffffff';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                let fontSize = 75;
-                let lines = [];
-                const textMaxWidth = cardW - 120;
-                const ayahSpaceTop = brandY + 150;
-                const ayahSpaceBottom = cardY + cardH - 180;
-                
-                while(fontSize >= 35) {
-                    ctx.font = `700 ${fontSize}px Amiri, serif`;
-                    lines = getWrappedLines(ctx, data.text, textMaxWidth);
-                    if (lines.length * (fontSize * 2.3) <= (ayahSpaceBottom - ayahSpaceTop)) break;
-                    fontSize -= 3;
-                }
-
-                let startLineY = ayahSpaceTop + ((ayahSpaceBottom - ayahSpaceTop)/2) - ((lines.length * fontSize * 2.3)/2) + (fontSize * 1.15);
-                
-                ctx.direction = 'rtl';
-                ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                ctx.shadowBlur = 15;
-                ctx.shadowOffsetY = 5;
-                lines.forEach((line, i) => {
-                    ctx.fillText(line.trim(), W/2, startLineY + (i*fontSize*2.3));
-                });
-                
-                ctx.direction = 'inherit';
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetY = 0;
-
-                // اسم السورة (ذهبي أنيق)
-                ctx.fillStyle = '#fcd34d'; // Amber/Gold
-                ctx.font = '800 48px Amiri, serif';
-                let surahNameStr = data.surah || data.surahStr || '';
-                let cleanSurah = surahNameStr.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
-                let ayahNumberSafe = data.ayah || data.ayahNum || '';
-                ctx.fillText(`سورة ${cleanSurah} ✦ آية ${ayahNumberSafe}`, W / 2, cardY + cardH - 100);
-
-                // الشريط السفلي (معلومات التطبيق) متجاوب مع الصوت
-                ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + pulse*0.3})`;
-                ctx.font = '500 36px Outfit, sans-serif';
-                ctx.fillText('ralball74.github.io/qurany.assem', W / 2, H - 120);
-
-                drawLoop = requestAnimationFrame(drawCanvasFrame);
-            }
-
-            // تحديث شريط التقدم بسلاسة بناءا على وقت الصوت
-            audioNode.addEventListener('timeupdate', () => {
-                if(audioNode.duration) {
-                    let p = (audioNode.currentTime / audioNode.duration) * 60; // Progress visually goes 40% to 100%
-                    videoProgressBar.style.width = (40 + p) + '%';
-                }
-            });
-
-            // بدء العمليه
-            drawLoop = requestAnimationFrame(drawCanvasFrame);
-            
-            let recordingStarted = false;
-            const startRecording = async () => {
-                if (recordingStarted) return;
-                if(recorder.state === 'inactive') {
-                    try {
-                        recordingStarted = true;
-                        if (audioCtx.state === 'suspended') await audioCtx.resume();
-                        // نطلب الداتا كل ثانية لضمان أن الـ chunks مش فاضية
-                        recorder.start(1000); 
-                        audioNode.play();
-                        console.log('Recording started...');
-                    } catch (err) {
-                        console.error('Start recording error:', err);
-                        videoProgressText.textContent = t('خطأ أثناء بدء التسجيل!');
-                    }
-                }
-            };
-
-            // لو الملف صغير جداً أو متحمل كاش، ممكن oncanplaythrough ما تشتغلش أو تشتغل فوري
-            if (audioNode.readyState >= 3) {
-                setTimeout(startRecording, 500);
-            } else {
-                audioNode.oncanplaythrough = startRecording;
-                // Failsafe: لو مأشتغلش بعد 5 ثواني
-                setTimeout(startRecording, 5000);
-            }
-
-            audioNode.onended = () => {
-                console.log('Audio ended, stopping recorder.');
-                if(recorder.state === 'recording') {
-                    recorder.stop();
-                }
-            };
-
-            audioNode.onerror = (e) => {
-                console.error('Audio node error:', e);
-                videoProgressText.textContent = t('خطأ في ملف الصوت!');
-                setTimeout(() => { videoProgressModal.style.display = 'none'; }, 2000);
-            };
-        }
 
         langBtn.addEventListener('click', () => {
             languageModal.style.display = 'flex';
@@ -2318,10 +1970,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 5. اسم السورة والآية (Metadata)
         ctx.fillStyle = 'rgba(26, 188, 156, 1)';
         ctx.font = '800 42px Amiri, serif';
-        let surahNameStr = data.surah || data.surahStr || '';
-        let cleanSurah = surahNameStr.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
-        let ayahNumberSafe = data.ayah || data.ayahNum || '';
-        ctx.fillText(`سورة ${cleanSurah} • آية ${ayahNumberSafe}`, W / 2, cardY + cardH - 120);
+        let cleanSurah = data.surah.replace(/سورة|سُورَةُ|سُورَةِ|سُورَةَ/g, '').trim();
+        ctx.fillText(`سورة ${cleanSurah} • آية ${data.ayah}`, W / 2, cardY + cardH - 120);
 
         // 6. الحقوق في الأسفل (Footer)
         // ctx.fillStyle = '#64748b';
