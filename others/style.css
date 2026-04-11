@@ -4190,8 +4190,15 @@ body.dark-mode .close-modal-btn {
 
 /* إخفاء أسهم input number */
 .mushaf-page-jump input::-webkit-outer-spin-button,
-.mushaf-page-jump input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.mushaf-page-jump input[type=number] { -moz-appearance: textfield; }
+.mushaf-page-jump input::-webkit-inner-spin-button { 
+    -webkit-appearance: none; 
+    appearance: none;
+    margin: 0; 
+}
+.mushaf-page-jump input[type=number] { 
+    -moz-appearance: textfield; 
+    appearance: textfield;
+}
 
 .mushaf-page-jump button {
     background: var(--primary-color);
