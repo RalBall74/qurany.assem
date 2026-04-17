@@ -87,9 +87,11 @@
 
     <link rel="stylesheet" href="others/style.css">
     <!-- خطوط جوجل -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600&family=Tajawal:wght@300;400;500;700&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600&family=Tajawal:wght@300;400;500;700&display=swap"></noscript>
+    
     <link rel="manifest" href="others/manifest.json">
     <meta name="theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
@@ -97,7 +99,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <!-- أيقونات Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 </head>
 
 <body class="light-mode notranslate">
@@ -118,12 +121,12 @@
                 </div>
                 <div class="user-actions">
 
-                    <button id="lang-btn" title="اختيار اللغة"
+                    <button id="lang-btn" title="اختيار اللغة" aria-label="اختيار اللغة"
                         style="background: none; border: none; font-size: 1.2rem; color: var(--text-muted); margin-left: 15px;">
                         <i class="fas fa-globe"></i>
                     </button>
                     <div class="theme-toggle" style="display: inline-block; vertical-align: middle;">
-                        <input type="checkbox" id="theme-switch" />
+                        <input type="checkbox" id="theme-switch" aria-label="تغيير المظهر" />
                         <label for="theme-switch" class="switch-label">
                             <i class="fas fa-moon"></i>
                             <i class="fas fa-sun"></i>
@@ -134,10 +137,10 @@
             </div>
             <div class="search-bar">
                 <i class="fas fa-search" style="color: var(--text-muted);"></i>
-                <input type="text" id="surah-search" placeholder="ابحث عن سورة أو آية...">
-                <div class="search-toggle-btn" id="search-type-toggle" title="تغيير نوع البحث">
+                <input type="text" id="surah-search" placeholder="ابحث عن سورة أو آية..." aria-label="البحث عن سورة أو آية">
+                <button class="search-toggle-btn" id="search-type-toggle" title="تغيير نوع البحث" aria-label="تغيير نوع البحث" style="background:none;border:none;cursor:pointer;">
                     <span id="search-type-label">سورة</span>
-                </div>
+                </button>
             </div>
         </header>
 
@@ -226,9 +229,9 @@
                 </div>
                 <div class="chat-input-area">
                     <div class="chat-input-wrapper">
-                        <input type="text" id="ai-input" placeholder="اكتب سؤالك هنا..." autocomplete="off">
+                        <input type="text" id="ai-input" placeholder="اكتب سؤالك هنا..." autocomplete="off" aria-label="اكتب سؤالك للمساعد الذكي">
                     </div>
-                    <button id="send-ai-btn" disabled><i class="fas fa-arrow-left"></i></button>
+                    <button id="send-ai-btn" disabled aria-label="إرسال"><i class="fas fa-arrow-left"></i></button>
                 </div>
             </section>
 
@@ -291,7 +294,7 @@
             <!-- عن المطور - تصميم هادئ وراقي -->
             <section id="about-view" class="others-subview page-animate" style="display: none;">
                 <div class="view-header">
-                    <button class="back-btn" id="about-back"><i class="fas fa-arrow-right"></i></button>
+                    <button class="back-btn" id="about-back" aria-label="الرجوع"><i class="fas fa-arrow-right"></i></button>
                     <h2>عن المطور</h2>
                 </div>
                 
@@ -361,7 +364,7 @@
                             <div class="rosary-inner-circle"></div>
                         </button>
                     </div>
-                    <button id="rosary-reset-btn" class="rosary-reset" title="تصفير العداد"><i
+                    <button id="rosary-reset-btn" class="rosary-reset" title="تصفير العداد" aria-label="تصفير العداد"><i
                             class="fas fa-redo"></i></button>
                 </div>
             </section>
@@ -517,10 +520,10 @@
                 <div class="ayah-header">
                     <h3 id="viewer-title">سورة الفاتحة</h3>
                     <div class="ayah-header-actions">
-                        <button id="open-mushaf-btn" title="عرض المصحف الرقمي 3D" class="mushaf-toggle-btn">
+                        <button id="open-mushaf-btn" title="عرض المصحف الرقمي 3D" class="mushaf-toggle-btn" aria-label="عرض المصحف الرقمي">
                             <i class="fas fa-book-open"></i>
                         </button>
-                        <button id="close-viewer"><i class="fas fa-times"></i></button>
+                        <button id="close-viewer" aria-label="إغلاق"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
                 <div id="ayah-content" class="ayah-content">
@@ -559,14 +562,14 @@
 
                 <!-- أزرار التنقل -->
                 <div class="mushaf-controls">
-                    <button id="mushaf-prev" class="mushaf-ctrl-btn" title="الصفحة السابقة">
+                    <button id="mushaf-prev" class="mushaf-ctrl-btn" title="الصفحة السابقة" aria-label="الصفحة السابقة">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                     <div class="mushaf-page-jump">
-                        <input type="number" id="mushaf-page-input" min="1" max="604" placeholder="رقم الصفحة" />
-                        <button id="mushaf-goto-btn">اذهب</button>
+                        <input type="number" id="mushaf-page-input" min="1" max="604" placeholder="رقم الصفحة" aria-label="رقم الصفحة" />
+                        <button id="mushaf-goto-btn" aria-label="انتقال">اذهب</button>
                     </div>
-                    <button id="mushaf-next" class="mushaf-ctrl-btn" title="الصفحة التالية">
+                    <button id="mushaf-next" class="mushaf-ctrl-btn" title="الصفحة التالية" aria-label="الصفحة التالية">
                         <i class="fas fa-chevron-left"></i>
                     </button>
                 </div>
@@ -596,11 +599,11 @@
                         </div>
                     </div>
                     <div class="info-actions">
-                        <button id="download-btn" class="download-btn" title="تحميل السورة"><i
+                        <button id="download-btn" class="download-btn" title="تحميل السورة" aria-label="تحميل السورة"><i
                                 class="fas fa-cloud-download-alt"></i></button>
-                        <button id="show-text-btn" class="text-btn" title="عرض الآيات"><i
+                        <button id="show-text-btn" class="text-btn" title="عرض الآيات" aria-label="عرض الآيات"><i
                                 class="fas fa-file-alt"></i></button>
-                        <button id="fav-btn" class="fav-btn"><i class="far fa-heart"></i></button>
+                        <button id="fav-btn" class="fav-btn" aria-label="إضافة للمفضلة"><i class="far fa-heart"></i></button>
                     </div>
                 </div>
 
@@ -614,9 +617,9 @@
                         <span id="duration" class="time-label">00:00</span>
                     </div>
                     <div class="buttons">
-                        <button id="prev-btn"><i class="fas fa-step-backward"></i></button>
-                        <button id="play-btn" class="play-main"><i class="fas fa-play"></i></button>
-                        <button id="next-btn"><i class="fas fa-step-forward"></i></button>
+                        <button id="prev-btn" aria-label="السابق"><i class="fas fa-step-backward"></i></button>
+                        <button id="play-btn" class="play-main" aria-label="إيقاف/تشغيل"><i class="fas fa-play"></i></button>
+                        <button id="next-btn" aria-label="التالي"><i class="fas fa-step-forward"></i></button>
                     </div>
                 </div>
             </div>
@@ -739,7 +742,7 @@
                         </select>
                     </div>
                 </div>
-                <button id="close-tafsir"><i class="fas fa-times"></i></button>
+                <button id="close-tafsir" aria-label="إغلاق"><i class="fas fa-times"></i></button>
             </div>
             <div id="tafsir-body" class="tafsir-body">
                 <div class="loader">جاري تحميل التفسير...</div>
@@ -751,7 +754,7 @@
     <div id="share-modal" class="modal">
         <div class="modal-content share-content">
             <div class="view-header">
-                <button class="back-btn" id="close-share"><i class="fas fa-times"></i></button>
+                <button class="back-btn" id="close-share" aria-label="إغلاق"><i class="fas fa-times"></i></button>
                 <h2>مشاركة الآية</h2>
             </div>
             <div class="share-preview-container">
@@ -793,12 +796,11 @@
 
 
     <audio id="main-audio" src=""></audio>
-    <script src="js/reciters.js"></script>
-    <script src="js/duas.js"></script>
-
-    <script src="js/translations.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/ai-service.js"></script>
+    <script src="js/reciters.js" defer></script>
+    <script src="js/duas.js" defer></script>
+    <script src="js/translations.js" defer></script>
+    <script src="js/app.js" defer></script>
+    <script src="js/ai-service.js" defer></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
