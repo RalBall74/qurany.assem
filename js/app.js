@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderReciters() {
         recitersGridEl.innerHTML = recitersData.map(r => `
             <div class="reciter-card ${r.id === reciter.id ? 'active' : ''}" data-id="${r.id}">
-                <img src="${r.img}" alt="${t(r.name)}" loading="lazy">
+                <img src="${r.img}" alt="${t(r.name)}">
                 <p>${t(r.name)}</p>
             </div>
         `).join('');
