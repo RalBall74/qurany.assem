@@ -567,13 +567,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // نكتب اسم التطبيق "قرآني" بخط عريض
                 ctx.fillStyle = '#ffffff';
                 ctx.textAlign = 'center';
-                ctx.font = '900 60px Tajawal, sans-serif';
+                ctx.font = '700 60px "Amiri", serif';
                 ctx.shadowColor = 'rgba(0,0,0,0.2)';
                 ctx.shadowBlur = 15;
                 ctx.fillText('قرآني', 256, 380);
 
                 // ونكتب اسم القارئ تحتيه بقارئ أصغر شوية
-                ctx.font = '500 35px Tajawal, sans-serif';
+                ctx.font = '400 35px "Amiri", serif';
                 ctx.shadowBlur = 0;
                 ctx.fillText(reciterName, 256, 440);
 
