@@ -425,6 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         surahListEl.innerHTML = '';
+        const fragment = document.createDocumentFragment();
         surahList.forEach((surah, index) => {
             const card = document.createElement('div');
             card.className = 'surah-card';
@@ -450,8 +451,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 playSurah(surahs[idx], idx);
             });
 
-            surahListEl.appendChild(card);
+            fragment.appendChild(card);
         });
+        surahListEl.appendChild(fragment);
     }
 
     // لوجيك الصوت والتحكم في المشغل
@@ -710,6 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderAyahSearchResults(matches) {
         surahListEl.innerHTML = '';
+        const fragment = document.createDocumentFragment();
         matches.forEach((match, index) => {
             const card = document.createElement('div');
             card.className = 'surah-card ayah-result';
@@ -767,8 +770,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            surahListEl.appendChild(card);
+            fragment.appendChild(card);
         });
+        surahListEl.appendChild(fragment);
     }
 
     // تظبيط تتبع السكرول في القراءة عشان نعرف اليوزر واقف فين
@@ -796,6 +800,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 readingObserver.observe(el);
             });
         }, 100);
+    }
+
+    function updateSurahCardsPlayState() {
+        document.querySelectorAll('.surah-card').forEach(card => {
+            const idx = parseInt(card.dataset.index);
+            const icon = card.querySelector('i');
+            if (icon && (icon.classList.contains('fa-play-circle') || icon.classList.contains('fa-pause-circle'))) {
+                if (idx === curIdx) {
+                    icon.className = `fas ${isPlaying ? 'fa-pause-circle' : 'fa-play-circle'} play-icon-pulse`;
+                } else {
+                    icon.className = 'fas fa-play-circle play-icon-pulse';
+                }
+            }
+        });
     }
 
     // شوية أدوات وإعدادات عامة في التطبيق
@@ -901,7 +919,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updatePlayBtn();
             playerImg.classList.add('playing');
             updateMediaPlaybackState('playing');
-            renderSurahs(surahs);
+            updateSurahCardsPlayState();
         });
 
         playerAudio.addEventListener('pause', () => {
@@ -909,7 +927,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updatePlayBtn();
             playerImg.classList.remove('playing');
             updateMediaPlaybackState('paused');
-            renderSurahs(surahs);
+            updateSurahCardsPlayState();
         });
 
         progressBar.addEventListener('click', (e) => {
@@ -1460,17 +1478,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // لوجيك تصغير المشغل عند السكرول وتحويله لزرار دائري
         if (contentArea && playerBar) {
+            let isScrolling = false;
             contentArea.addEventListener('scroll', () => {
-                if (contentArea.scrollTop > 400 && playerBar.style.display === 'flex') {
-                    if (!playerManuallyMaximized) {
-                        playerBar.classList.add('minimized');
-                    }
-                } else if (contentArea.scrollTop <= 400) {
-                    playerBar.classList.remove('minimized');
-                    playerManuallyMaximized = false; // ريست للحالة لما نرجع لفوق
+                if (!isScrolling) {
+                    window.requestAnimationFrame(() => {
+                        if (contentArea.scrollTop > 400 && playerBar.style.display === 'flex') {
+                            if (!playerManuallyMaximized && !playerBar.classList.contains('minimized')) {
+                                playerBar.classList.add('minimized');
+                            }
+                        } else if (contentArea.scrollTop <= 400) {
+                            if (playerBar.classList.contains('minimized')) {
+                                playerBar.classList.remove('minimized');
+                            }
+                            playerManuallyMaximized = false; // ريست للحالة لما نرجع لفوق
+                        }
+                        isScrolling = false;
+                    });
+                    isScrolling = true;
                 }
-
-            });
+            }, { passive: true });
         }
 
         // لو ضغطنا على المشغل وهو صغير يرجع تاني كبير
