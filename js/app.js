@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // جرب نجيب من الكاش الأول عشان السرعة
         try {
-            const cache = await caches.open('quran-app-v11');
+            const cache = await caches.open('quran-app-v10');
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // جرب الكاش الأول
         try {
-            const cache = await caches.open('quran-app-v11');
+            const cache = await caches.open('quran-app-v10');
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
@@ -1794,7 +1794,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const audioCache = await caches.open('quran-audio-v1');
-            const apiCache = await caches.open('quran-app-v11');
+            const apiCache = await caches.open('quran-app-v10');
 
             // نحمل ملف الصوت ونحطه في الكاش
             // لازم نستخدم fetch عادي (مش no-cors) عشان الـ opaque response مش بيشتغل مع الـ audio player
