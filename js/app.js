@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let playerManuallyMaximized = false;
     let audioContext, analyser, audioSource, visualizerAnimationId;
     let isFocusMode = false;
+    let currentAyahAudio = null;
 
 
     const innahuRabbiPlaylist = [
@@ -750,6 +751,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة" data-surah="${surah.name.replace('سورة ', '')}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
                                         <i class="fas fa-camera"></i>
                                     </div>
+                                    <div class="ayah-action-btn play-ayah-btn" title="استماع للآية" data-global="${a.number}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">
+                                        <i class="fas fa-play"></i>
+                                    </div>
                                 </div>
                             </div>
                         `).join(' ');
@@ -1304,6 +1308,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="ayah-action-btn share-ayah-btn" title="مشاركة كصورة" data-surah="${surah.name.replace('سورة ', '')}" data-ayah="${a.numberInSurah}" data-text="${a.text}">
                                 <i class="fas fa-camera"></i>
                             </div>
+                            <div class="ayah-action-btn play-ayah-btn" title="استماع للآية" data-global="${a.number}" data-surah="${surah.number}" data-ayah="${a.numberInSurah}">
+                                <i class="fas fa-play"></i>
+                            </div>
                         </div>
                     </div>
                 `).join(' ');
@@ -1351,7 +1358,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // لوجيك كروت المشاركة
+        // لوجيك كروت المشاركة وتشغيل الآيات
         ayahContent.addEventListener('click', (e) => {
             const shareBtn = e.target.closest('.share-ayah-btn');
             if (shareBtn) {
@@ -1362,6 +1369,53 @@ document.addEventListener('DOMContentLoaded', () => {
                     text: shareBtn.dataset.text
                 };
                 generateAyahCard(data);
+            }
+
+            const playBtn = e.target.closest('.play-ayah-btn');
+            if (playBtn) {
+                e.stopPropagation();
+                
+                const icon = playBtn.querySelector('i');
+                const globalAyahNumber = playBtn.dataset.global;
+                
+                // Toggle pause if the same ayah is playing
+                if (currentAyahAudio && currentAyahAudio.src.includes(`/${globalAyahNumber}.mp3`) && !currentAyahAudio.paused) {
+                    currentAyahAudio.pause();
+                    icon.className = 'fas fa-play';
+                    return;
+                }
+
+                // Stop any playing ayah
+                if (currentAyahAudio) {
+                    currentAyahAudio.pause();
+                    currentAyahAudio.currentTime = 0;
+                }
+                
+                // Reset all icons to play
+                document.querySelectorAll('.play-ayah-btn i').forEach(i => {
+                    i.className = 'fas fa-play';
+                });
+
+                // Pause main player if it's playing
+                if (isPlaying && playerAudio) {
+                    playerAudio.pause();
+                }
+
+                // Create new audio instance or update src
+                currentAyahAudio = new Audio(`https://cdn.islamic.network/quran/audio/128/ar.alafasy/${globalAyahNumber}.mp3`);
+                
+                icon.className = 'fas fa-spinner fa-spin';
+                
+                currentAyahAudio.play().then(() => {
+                    icon.className = 'fas fa-pause';
+                }).catch(err => {
+                    console.error('Failed to play ayah:', err);
+                    icon.className = 'fas fa-exclamation-triangle';
+                });
+                
+                currentAyahAudio.onended = () => {
+                    icon.className = 'fas fa-play';
+                };
             }
         });
 
