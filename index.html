@@ -285,6 +285,15 @@
                         <i class="fas fa-chevron-left"></i>
                     </div>
 
+                    <div class="other-card" id="radio-btn">
+                        <div class="other-icon"><i class="fas fa-broadcast-tower"></i></div>
+                        <div class="other-info">
+                            <h3>إذاعات القرآن</h3>
+                            <p>استمع للقرآن مباشرة على مدار الساعة</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
                 </div>
             </section>
 
@@ -510,6 +519,56 @@
                         </div>
                     </div>
                 </div>
+            </section>
+
+
+            <!-- إذاعات القرآن المباشرة -->
+            <section id="radio-view" class="others-subview page-animate" style="display: none;">
+                <div class="view-header">
+                    <button class="back-btn" id="radio-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>إذاعات القرآن</h2>
+                </div>
+
+                <!-- المشغل المباشر -->
+                <div class="radio-player-card" id="radio-player-card" style="display: none;">
+                    <div class="radio-live-badge">
+                        <span class="live-dot"></span>
+                        <span>بث مباشر</span>
+                    </div>
+                    <div class="radio-visualizer-area">
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                        <div class="radio-wave-bar"></div>
+                    </div>
+                    <h3 id="radio-station-name" class="radio-station-name">اختر إذاعة</h3>
+                    <div class="radio-controls">
+                        <button id="radio-play-btn" class="radio-play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="radio-volume-control">
+                        <i class="fas fa-volume-down"></i>
+                        <input type="range" id="radio-volume" min="0" max="100" value="80" class="radio-volume-slider">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                </div>
+
+                <!-- شبكة المحطات -->
+                <div id="radio-stations-grid" class="radio-stations-grid"></div>
+                <audio id="radio-audio" src="" preload="none"></audio>
             </section>
 
 

@@ -84,7 +84,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadCardBtn = document.getElementById('download-card-btn');
     const nativeShareBtn = document.getElementById('native-share-btn');
 
-
+    // عناصر الراديو المباشر
+    const radioBtn = document.getElementById('radio-btn');
+    const radioView = document.getElementById('radio-view');
+    const radioBack = document.getElementById('radio-back');
+    const radioAudio = document.getElementById('radio-audio');
+    const radioPlayBtn = document.getElementById('radio-play-btn');
+    const radioPlayerCard = document.getElementById('radio-player-card');
+    const radioStationName = document.getElementById('radio-station-name');
+    const radioStationsGrid = document.getElementById('radio-stations-grid');
+    const radioVolumeSlider = document.getElementById('radio-volume');
+    const radioSearchInput = document.getElementById('radio-search');
 
     // حالة التطبيق والحاجات اللي بتتحفظ
     let surahs = [];
@@ -107,6 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let isFocusMode = false;
     let currentAyahAudio = null;
 
+    // حالة الراديو
+    let radioStations = [];
+    let currentRadioStation = null;
+    let isRadioPlaying = false;
+    let radioStationsLoaded = false;
 
     const innahuRabbiPlaylist = [
         { "title": "١- الرب (المجلس الأول) - إنه ربي - شريف علي", "id": "-zMW2Rqjwcc" },
@@ -974,6 +989,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (videosView) videosView.style.display = 'none';
                 if (playlistModal) playlistModal.style.display = 'none';
                 if (singleVideoPlayerView) singleVideoPlayerView.style.display = 'none';
+                if (radioView) radioView.style.display = 'none';
+                // وقف الراديو لو سابت الصفحة
+                if (isRadioPlaying && radioAudio) {
+                    radioAudio.pause();
+                    isRadioPlaying = false;
+                    if (radioPlayerCard) radioPlayerCard.classList.remove('playing');
+                    if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
 
                 if (playlistPlayerView) {
                     playlistPlayerView.style.display = 'none';
@@ -1076,6 +1099,266 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // ============================================================
+        // لوجيك الراديو المباشر - قائمة محطات منتقاة
+        // ============================================================
+
+        // المحطات المنتقاة بعناية مع أيقونات وأوصاف
+        const curatedRadioStations = [
+            {
+                id: 1,
+                name: 'إذاعة القرآن الكريم - السعودية',
+                subtitle: 'بث مباشر من المملكة العربية السعودية',
+                color: '#1abc9c',
+                url: 'https://stream.radiojar.com/0tpy1h0kxtzuv',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="14" height="12" rx="0.5"/><polyline points="3,9 12,3.5 21,9"/><line x1="5" y1="13" x2="19" y2="13"/><rect x="10" y="16" width="4" height="5" rx="0.3"/><path d="M1 17 Q2.5 15 1 13" stroke-width="1.1"/><path d="M23 17 Q21.5 15 23 13" stroke-width="1.1"/></svg>`
+            },
+            {
+                id: 2,
+                name: 'إذاعة القرآن الكريم - القاهرة',
+                subtitle: 'بث مباشر من إذاعة القرآن المصرية',
+                color: '#16a085',
+                url: 'https://n0e.radiojar.com/8s5u5tpdtwzuv',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="2,20 9.5,8 17,20"/><polygon points="11,20 16.5,11 22,20"/><line x1="1" y1="20" x2="23" y2="20"/><path d="M18.5 5 Q20 3.5 21.5 5" stroke-width="1.2"/><path d="M18 3 Q20 1 22 3" stroke-width="1.2"/></svg>`
+            },
+            {
+                id: 3,
+                name: 'الشمائل المحمدية',
+                subtitle: 'في سيرة وشمائل النبي ﷺ',
+                color: '#8e44ad',
+                url: 'https://backup.qurango.net/radio/shmaeel',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 0 1 11.5 22 9 9 0 0 1 2 12.8 9 9 0 0 1 11.5 3a6.5 6.5 0 0 0 0 9.8 6.5 6.5 0 0 0 9.5 0z"/><polygon points="19.5,4 20,5.5 21.5,5.5 20.3,6.4 20.7,8 19.5,7.1 18.3,8 18.7,6.4 17.5,5.5 19,5.5" fill="currentColor" stroke="none"/></svg>`
+            },
+            {
+                id: 4,
+                name: 'تفسير غريب القرآن',
+                subtitle: 'شرح معاني الألفاظ القرآنية الغريبة',
+                color: '#e67e22',
+                url: 'https://backup.qurango.net/radio/gareeb-quran',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="10" r="6.5"/><line x1="14.5" y1="15" x2="21" y2="21"/><line x1="7" y1="10" x2="12" y2="10"/><line x1="9.5" y1="7.5" x2="9.5" y2="12.5"/></svg>`
+            },
+            {
+                id: 5,
+                name: 'صحيح مسلم',
+                subtitle: 'أحاديث الإمام مسلم كاملة',
+                color: '#2980b9',
+                url: 'https://backup.qurango.net/radio/saheh-muslim',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3 Q4 3 4 5 L4 19 Q4 21 6 21 L6 3Z"/><path d="M6 3 L18 3 Q20 3 20 5 L20 19 Q20 21 18 21 L6 21"/><line x1="9" y1="8" x2="17" y2="8"/><line x1="9" y1="11" x2="17" y2="11"/><line x1="9" y1="14" x2="17" y2="14"/><line x1="9" y1="17" x2="14" y2="17"/><path d="M4 5 Q3 4 2 5 L2 19 Q3 20 4 19"/></svg>`
+            },
+            {
+                id: 6,
+                name: 'صحيح البخاري',
+                subtitle: 'أحاديث الإمام البخاري كاملة',
+                color: '#27ae60',
+                url: 'https://backup.qurango.net/radio/saheh-bokharee',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 2 Q13 2 9 9 L3 21 L6 22 L8 18 Q11 19 13 17 L19 9 Q22 5 22 2 Q21 2 20 2Z"/><line x1="8" y1="18" x2="13" y2="13"/><line x1="3" y1="21" x2="2" y2="23"/><path d="M17 5 Q19 6 18 8"/></svg>`
+            },
+            {
+                id: 7,
+                name: 'قصص الأنبياء',
+                subtitle: 'قصص الأنبياء والمرسلين عليهم السلام',
+                color: '#c0392b',
+                url: 'https://backup.qurango.net/radio/alanbiya',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 Q15 5 15 9 Q15 7 13.5 6 Q16 10 14 14 Q16 12 16.5 10 Q19 14 16.5 18 Q14.5 21 12 22 Q9.5 21 7.5 18 Q5 14 8 10 Q8.5 12 10 14 Q8 10 11 6 Q9.5 7 9 9 Q9 5 12 2Z"/></svg>`
+            },
+            {
+                id: 8,
+                name: 'المختصر في السيرة النبوية',
+                subtitle: 'ملخص سيرة النبي محمد ﷺ',
+                color: '#d35400',
+                url: 'https://backup.qurango.net/radio/almukhtasar_fi_alsiyra',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="4"/><path d="M7 10 Q7 6 12 6 Q17 6 17 10"/><rect x="4" y="10" width="16" height="11" rx="0.5"/><path d="M10 21 L10 16 Q10 14 12 14 Q14 14 14 16 L14 21"/><line x1="3" y1="21" x2="21" y2="21"/><line x1="4" y1="14" x2="4" y2="9"/><line x1="2.5" y1="9" x2="5.5" y2="9"/></svg>`
+            },
+            {
+                id: 9,
+                name: 'المختصر في تفسير القرآن',
+                subtitle: 'تفسير ميسّر لآيات القرآن الكريم',
+                color: '#1abc9c',
+                url: 'https://backup.qurango.net/radio/mukhtasartafsir',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="16" rx="1"/><line x1="8" y1="6" x2="8" y2="22"/><line x1="8" y1="10" x2="18" y2="10"/><line x1="8" y1="13" x2="18" y2="13"/><line x1="8" y1="16" x2="18" y2="16"/><line x1="12" y1="1" x2="12" y2="4.5"/><line x1="8.5" y1="2" x2="10" y2="4"/><line x1="15.5" y1="2" x2="14" y2="4"/></svg>`
+            },
+            {
+                id: 10,
+                name: 'أذكار المساء',
+                subtitle: 'أذكار المساء الواردة في السنة النبوية',
+                color: '#2c3e50',
+                url: 'https://backup.qurango.net/radio/athkar_masa',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13A8 8 0 0 1 10 21 8 8 0 0 1 2 13 8 8 0 0 1 10 5a6 6 0 0 0 0 8 6 6 0 0 0 10 0z"/><circle cx="19" cy="4" r="0.8" fill="currentColor" stroke="none"/><circle cx="22" cy="7" r="0.6" fill="currentColor" stroke="none"/><circle cx="21" cy="10" r="0.5" fill="currentColor" stroke="none"/></svg>`
+            },
+            {
+                id: 11,
+                name: 'إذاعة الفتاوى العامة',
+                subtitle: 'فتاوى وأحكام شرعية عامة',
+                color: '#7f8c8d',
+                url: 'https://backup.qurango.net/radio/fatwa',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M5 6 L3 15 Q3 17.5 6 17.5 Q9 17.5 9 15 L7 6"/><path d="M15 6 L13 15 Q13 17.5 16 17.5 Q19 17.5 19 15 L17 6"/><line x1="8" y1="21" x2="16" y2="21"/></svg>`
+            },
+            {
+                id: 12,
+                name: 'إذاعة تكبيرات العيد',
+                subtitle: 'تكبيرات العيد والمواسم الإسلامية',
+                color: '#f39c12',
+                url: 'https://backup.qurango.net/radio/eid',
+                svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 14A9 9 0 0 1 9 4 9 9 0 0 0 19 20 9 9 0 0 0 21 14z"/><polygon points="18,3 18.5,4.8 20.3,4.8 18.9,5.9 19.4,7.7 18,6.6 16.6,7.7 17.1,5.9 15.7,4.8 17.5,4.8" fill="currentColor" stroke="none"/><circle cx="6" cy="10" r="0.7" fill="currentColor" stroke="none"/><circle cx="4" cy="15" r="0.5" fill="currentColor" stroke="none"/></svg>`
+            }
+        ];
+
+        function loadRadioStations() {
+            if (radioStationsLoaded && radioStations.length > 0) {
+                renderRadioStations(radioStations);
+                return;
+            }
+            radioStations = curatedRadioStations;
+            radioStationsLoaded = true;
+            renderRadioStations(radioStations);
+        }
+
+        function renderRadioStations(list) {
+            if (!radioStationsGrid) return;
+            radioStationsGrid.innerHTML = list.map((station, idx) => {
+                const isActive = currentRadioStation && currentRadioStation.id === station.id;
+                return `
+                    <div class="radio-station-card ${isActive ? 'active' : ''}"
+                         data-id="${station.id}"
+                         data-url="${station.url}"
+                         data-name="${station.name}"
+                         style="animation-delay: ${idx * 0.06}s">
+                        <div class="radio-station-icon" style="--station-color: ${station.color}">
+                            ${station.svgIcon}
+                        </div>
+                        <h4>${station.name}</h4>
+                        <p class="radio-station-subtitle">${station.subtitle}</p>
+                    </div>`;
+            }).join('');
+
+            radioStationsGrid.querySelectorAll('.radio-station-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const id = parseInt(card.dataset.id);
+                    const url = card.dataset.url;
+                    const name = card.dataset.name;
+                    playRadioStation({ id, url, name });
+                });
+            });
+        }
+
+        function playRadioStation(station) {
+            if (!radioAudio) return;
+
+            // نفس المحطة — وقّف أو استأنف
+            if (currentRadioStation && currentRadioStation.id === station.id) {
+                if (isRadioPlaying) {
+                    radioAudio.pause();
+                    isRadioPlaying = false;
+                    if (radioPlayerCard) radioPlayerCard.classList.remove('playing');
+                    if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+                } else {
+                    const p = radioAudio.play();
+                    if (p !== undefined) {
+                        p.then(() => {
+                            isRadioPlaying = true;
+                            if (radioPlayerCard) radioPlayerCard.classList.add('playing');
+                            if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                        }).catch(() => {});
+                    }
+                }
+                return;
+            }
+
+            // محطة جديدة
+            currentRadioStation = station;
+            radioAudio.src = station.url;
+            radioAudio.volume = (radioVolumeSlider ? parseInt(radioVolumeSlider.value) : 80) / 100;
+
+            if (radioPlayerCard) radioPlayerCard.style.display = 'block';
+            if (radioStationName) radioStationName.textContent = station.name;
+            if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            radioAudio.load();
+            const playPromise = radioAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isRadioPlaying = true;
+                    if (radioPlayerCard) radioPlayerCard.classList.add('playing');
+                    if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                }).catch(e => {
+                    console.error('Radio play error:', e);
+                    if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    isRadioPlaying = false;
+                });
+            }
+
+            // تحديث الحالة النشطة على الكروت
+            if (radioStationsGrid) {
+                radioStationsGrid.querySelectorAll('.radio-station-card').forEach(c => {
+                    c.classList.toggle('active', parseInt(c.dataset.id) === station.id);
+                });
+            }
+        }
+
+        // زر تشغيل/إيقاف في المشغل
+        if (radioPlayBtn) {
+            radioPlayBtn.addEventListener('click', () => {
+                if (!currentRadioStation) return;
+                if (isRadioPlaying) {
+                    radioAudio.pause();
+                    isRadioPlaying = false;
+                    if (radioPlayerCard) radioPlayerCard.classList.remove('playing');
+                    radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+                } else {
+                    const p = radioAudio.play();
+                    if (p !== undefined) {
+                        p.then(() => {
+                            isRadioPlaying = true;
+                            if (radioPlayerCard) radioPlayerCard.classList.add('playing');
+                            radioPlayBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                        }).catch(() => {});
+                    }
+                }
+            });
+        }
+
+        // التحكم في مستوى الصوت
+        if (radioVolumeSlider && radioAudio) {
+            radioVolumeSlider.addEventListener('input', () => {
+                radioAudio.volume = parseInt(radioVolumeSlider.value) / 100;
+            });
+        }
+
+        // أحداث الصوت
+        if (radioAudio) {
+            radioAudio.addEventListener('error', () => {
+                isRadioPlaying = false;
+                if (radioPlayerCard) radioPlayerCard.classList.remove('playing');
+                if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+            radioAudio.addEventListener('waiting', () => {
+                if (radioPlayBtn && isRadioPlaying) {
+                    radioPlayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                }
+            });
+            radioAudio.addEventListener('playing', () => {
+                if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                isRadioPlaying = true;
+                if (radioPlayerCard) radioPlayerCard.classList.add('playing');
+            });
+        }
+
+        // فتح صفحة الراديو
+        if (radioBtn) {
+            radioBtn.addEventListener('click', () => {
+                if (othersSection) othersSection.style.display = 'none';
+                if (radioView) radioView.style.display = 'block';
+                loadRadioStations();
+            });
+        }
+
+        // الرجوع من صفحة الراديو (الراديو يستمر في الخلفية)
+        if (radioBack) {
+            radioBack.addEventListener('click', () => {
+                if (radioView) radioView.style.display = 'none';
+                if (othersSection) othersSection.style.display = 'block';
+            });
+        }
 
         // لوجيك التبديل بين الفيديوهات وقوائم التشغيل
         const videoTabBtns = document.querySelectorAll('.video-tab-btn');
