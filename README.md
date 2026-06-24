@@ -58,7 +58,7 @@
 
 ### 👨‍💻 عن المطور
 
-تم البرمجة والتصميم بواسطة **[عاصم محمد كمال أبو النصر](https://portfolio-for-assem.netlify.app)**.
+تم البرمجة والتصميم بواسطة **[عاصم محمد كمال أبو النصر](https://portfolio-for-assem.vercel.app)**.
 مؤسس شركة **تدفق (Tadfuq)** للبرمجيات.
 
 <p align="right">
