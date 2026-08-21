@@ -239,21 +239,22 @@
                 </div>
                 <div class="others-grid">
 
+                    <div class="other-card" id="deceased-dua-btn">
+                        <div class="other-icon"><i class="fas fa-praying-hands"></i></div>
+                        <div class="other-info">
+                            <h3>الدعاء لموتانا</h3>
+                            <p>ادعوا لهم بالرحمة والمغفرة</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+
 
                     <div class="other-card" id="about-dev-btn">
                         <div class="other-icon"><i class="fas fa-user-tie"></i></div>
                         <div class="other-info">
                             <h3>عن المطور</h3>
                             <p>معلومات عن مبرمج التطبيق</p>
-                        </div>
-                        <i class="fas fa-chevron-left"></i>
-                    </div>
-
-                    <div class="other-card" id="dua-day-btn">
-                        <div class="other-icon"><i class="fas fa-hand-holding-heart"></i></div>
-                        <div class="other-info">
-                            <h3>دعاء اليوم</h3>
-                            <p>دعاء متجدد كل يوم</p>
                         </div>
                         <i class="fas fa-chevron-left"></i>
                     </div>
@@ -281,15 +282,6 @@
                         <div class="other-info">
                             <h3>فيديوهات دينية</h3>
                             <p>شاهد فيديوهات وقوائم تشغيل دينية</p>
-                        </div>
-                        <i class="fas fa-chevron-left"></i>
-                    </div>
-
-                    <div class="other-card" id="radio-btn">
-                        <div class="other-icon"><i class="fas fa-broadcast-tower"></i></div>
-                        <div class="other-info">
-                            <h3>إذاعات القرآن</h3>
-                            <p>استمع للقرآن مباشرة على مدار الساعة</p>
                         </div>
                         <i class="fas fa-chevron-left"></i>
                     </div>
@@ -340,18 +332,122 @@
                     </div>
                 </div>
             </section>
-
-            <!-- دعاء اليوم -->
-            <section id="dua-view" class="others-subview page-animate" style="display: none;">
+            <!-- الدعاء لموتانا -->
+            <section id="deceased-dua-view" class="others-subview page-animate" style="display: none;">
                 <div class="view-header">
-                    <button class="back-btn" id="dua-back"><i class="fas fa-arrow-right"></i></button>
-                    <h2>دعاء اليوم</h2>
+                    <button class="back-btn" id="deceased-dua-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>الدعاء لموتانا</h2>
                 </div>
-                <div class="dua-container" id="dua-content-container">
-                    <p class="dua-text" id="dua-text-el"></p>
+                <div class="deceased-dua-container">
+                    <div class="deceased-intro-card">
+                        <i class="fas fa-heart deceased-intro-icon"></i>
+                        <p>اللهم اغفر لأمواتنا وأموات المسلمين، وارحمهم برحمتك الواسعة، وأسكنهم فسيح جناتك</p>
+                    </div>
+
+                    <!-- أحمد كمال -->
+                    <div class="deceased-person-card">
+                        <div class="deceased-person-header">
+                            <div class="deceased-person-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3>أحمد كمال</h3>
+                            <span class="deceased-badge">رحمه الله</span>
+                        </div>
+                        <div class="deceased-duas-list">
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم اغفر لأحمد كمال وارحمه وعافه واعفُ عنه</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم أكرم نُزُل أحمد كمال ووسّع مدخله واغسله بالماء والثلج والبرد</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم نقّه من الخطايا كما يُنقّى الثوب الأبيض من الدنس</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم أبدله داراً خيراً من داره وأهلاً خيراً من أهله</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم أدخله الجنة وأعذه من عذاب القبر ومن عذاب النار</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- كمال أبو النصر -->
+                    <div class="deceased-person-card">
+                        <div class="deceased-person-header">
+                            <div class="deceased-person-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3>كمال أبو النصر</h3>
+                            <span class="deceased-badge">رحمه الله</span>
+                        </div>
+                        <div class="deceased-duas-list">
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم اغفر لكمال أبو النصر وارحمه وعافه واعفُ عنه</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم أكرم نُزُل كمال أبو النصر ووسّع مدخله واغسله بالماء والثلج والبرد</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم نقّه من الخطايا كما يُنقّى الثوب الأبيض من الدنس</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم ارفع درجته في المهديين واخلفه في عقبه في الغابرين</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم افسح له في قبره ونوّر له فيه واجعله روضة من رياض الجنة</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- سلطان -->
+                    <div class="deceased-person-card">
+                        <div class="deceased-person-header">
+                            <div class="deceased-person-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3>سلطان</h3>
+                            <span class="deceased-badge">رحمه الله</span>
+                        </div>
+                        <div class="deceased-duas-list">
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم اغفر لسلطان وارحمه وعافه واعفُ عنه</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم أكرم نُزُل سلطان ووسّع مدخله واغسله بالماء والثلج والبرد</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم نقّه من الخطايا كما يُنقّى الثوب الأبيض من الدنس</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم اجعل قبره نوراً وأنيساً وارزقه الفردوس الأعلى</p>
+                            </div>
+                            <div class="deceased-dua-item">
+                                <i class="fas fa-star"></i>
+                                <p>اللهم ثبّته عند السؤال وآنس وحشته وارحم غربته</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="deceased-footer-note">
+                        <p>🤲 لا تنسوهم من صالح دعائكم 🤲</p>
+                    </div>
                 </div>
             </section>
-
 
 
             <!-- السبحة الإلكترونية -->
@@ -522,56 +618,6 @@
             </section>
 
 
-            <!-- إذاعات القرآن المباشرة -->
-            <section id="radio-view" class="others-subview page-animate" style="display: none;">
-                <div class="view-header">
-                    <button class="back-btn" id="radio-back"><i class="fas fa-arrow-right"></i></button>
-                    <h2>إذاعات القرآن</h2>
-                </div>
-
-                <!-- المشغل المباشر -->
-                <div class="radio-player-card" id="radio-player-card" style="display: none;">
-                    <div class="radio-live-badge">
-                        <span class="live-dot"></span>
-                        <span>بث مباشر</span>
-                    </div>
-                    <div class="radio-visualizer-area">
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                        <div class="radio-wave-bar"></div>
-                    </div>
-                    <h3 id="radio-station-name" class="radio-station-name">اختر إذاعة</h3>
-                    <div class="radio-controls">
-                        <button id="radio-play-btn" class="radio-play-btn">
-                            <i class="fas fa-play"></i>
-                        </button>
-                    </div>
-                    <div class="radio-volume-control">
-                        <i class="fas fa-volume-down"></i>
-                        <input type="range" id="radio-volume" min="0" max="100" value="80" class="radio-volume-slider">
-                        <i class="fas fa-volume-up"></i>
-                    </div>
-                </div>
-
-                <!-- شبكة المحطات -->
-                <div id="radio-stations-grid" class="radio-stations-grid"></div>
-                <audio id="radio-audio" src="" preload="none"></audio>
-            </section>
-
-
             <div id="ayah-viewer" class="ayah-viewer">
                 <div class="ayah-header">
                     <h3 id="viewer-title">سورة الفاتحة</h3>
@@ -731,6 +777,19 @@
         </div>
     </div>
 
+    <!-- تنبيه الدعاء لعمي أحمد (يظهر مرة واحدة عند فتح التطبيق) -->
+    <div id="condolence-modal" class="modal condolence-modal">
+        <div class="modal-content condolence-content">
+            <div class="condolence-icon">
+                <i class="fas fa-hands-praying"></i>
+            </div>
+            <h3 class="condolence-title">إنا لله وإنا إليه راجعون</h3>
+            <p class="condolence-name">عمي أحمد كمال</p>
+            <p class="condolence-text">اللهم اغفر له وارحمه وعافه واعفُ عنه وأكرم نُزُله ووسّع مدخله</p>
+            <button id="close-condolence" class="condolence-btn">اللهم آمين 🤲</button>
+        </div>
+    </div>
+
     <!-- تنبيه الصلاة على النبي -->
     <div id="salawat-modal" class="modal salawat-modal">
         <div class="modal-content salawat-content">
@@ -853,7 +912,7 @@
 
     <audio id="main-audio" src=""></audio>
     <script src="js/reciters.js"></script>
-    <script src="js/duas.js"></script>
+
 
     <script src="js/translations.js"></script>
     <script src="js/app.js"></script>

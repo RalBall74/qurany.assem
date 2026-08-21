@@ -25,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const langBtn = document.getElementById('lang-btn');
     const languageModal = document.getElementById('language-modal');
     const closeLanguage = document.getElementById('close-language');
-    const duaView = document.getElementById('dua-view');
-    const duaTextEl = document.getElementById('dua-text-el');
     const tafsirModal = document.getElementById('tafsir-modal');
     const closeTafsir = document.getElementById('close-tafsir');
     const tafsirBody = document.getElementById('tafsir-body');
@@ -38,6 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchTypeLabel = document.getElementById('search-type-label');
     const salawatModal = document.getElementById('salawat-modal');
     const closeSalawat = document.getElementById('close-salawat');
+    const condolenceModal = document.getElementById('condolence-modal');
+    const closeCondolence = document.getElementById('close-condolence');
     const othersSection = document.getElementById('others-section');
     const athkarView = document.getElementById('athkar-view');
     const aboutView = document.getElementById('about-view');
@@ -84,18 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadCardBtn = document.getElementById('download-card-btn');
     const nativeShareBtn = document.getElementById('native-share-btn');
 
-    // عناصر الراديو المباشر
-    const radioBtn = document.getElementById('radio-btn');
-    const radioView = document.getElementById('radio-view');
-    const radioBack = document.getElementById('radio-back');
-    const radioAudio = document.getElementById('radio-audio');
-    const radioPlayBtn = document.getElementById('radio-play-btn');
-    const radioPlayerCard = document.getElementById('radio-player-card');
-    const radioStationName = document.getElementById('radio-station-name');
-    const radioStationsGrid = document.getElementById('radio-stations-grid');
-    const radioVolumeSlider = document.getElementById('radio-volume');
-    const radioSearchInput = document.getElementById('radio-search');
-
     // حالة التطبيق والحاجات اللي بتتحفظ
     let surahs = [];
     let reciter = recitersData[0];
@@ -116,12 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioContext, analyser, audioSource, visualizerAnimationId;
     let isFocusMode = false;
     let currentAyahAudio = null;
-
-    // حالة الراديو
-    let radioStations = [];
-    let currentRadioStation = null;
-    let isRadioPlaying = false;
-    let radioStationsLoaded = false;
 
     const innahuRabbiPlaylist = [
         { "title": "١- الرب (المجلس الأول) - إنه ربي - شريف علي", "id": "-zMW2Rqjwcc" },
@@ -259,6 +241,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // تحديث بطاقة الترحيب والتحية
         updateHeroCard();
+
+        // عرض تنبيه الدعاء لعمي أحمد عند فتح التطبيق
+        setTimeout(() => {
+            if (condolenceModal) {
+                condolenceModal.style.display = 'flex';
+                setTimeout(() => {
+                    condolenceModal.classList.add('show');
+                }, 10);
+            }
+        }, 1500);
     }
 
 
@@ -983,20 +975,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (othersSection) othersSection.style.display = 'none';
                 if (athkarView) athkarView.style.display = 'none';
                 if (aboutView) aboutView.style.display = 'none';
-                if (duaView) duaView.style.display = 'none';
                 if (rosaryView) rosaryView.style.display = 'none';
                 if (prayerView) prayerView.style.display = 'none';
                 if (videosView) videosView.style.display = 'none';
                 if (playlistModal) playlistModal.style.display = 'none';
                 if (singleVideoPlayerView) singleVideoPlayerView.style.display = 'none';
-                if (radioView) radioView.style.display = 'none';
-                // وقف الراديو لو سابت الصفحة
-                if (isRadioPlaying && radioAudio) {
-                    radioAudio.pause();
-                    isRadioPlaying = false;
-                    if (radioPlayerCard) radioPlayerCard.classList.remove('playing');
-                    if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
-                }
 
                 if (playlistPlayerView) {
                     playlistPlayerView.style.display = 'none';
@@ -1039,25 +1022,21 @@ document.addEventListener('DOMContentLoaded', () => {
             aboutView.style.display = 'block';
         });
 
-        document.getElementById('dua-day-btn')?.addEventListener('click', () => {
-            othersSection.style.display = 'none';
-            duaView.style.display = 'block';
-            duaTextEl.textContent = t(getDuaOfTheDay());
-        });
-
-        // لوجيك أزرار الرجوع من الصفحات الفرعية للرئيسية "أخرى"
-        document.getElementById('athkar-back')?.addEventListener('click', () => {
-            athkarView.style.display = 'none';
-            othersSection.style.display = 'block';
-        });
-
         document.getElementById('about-back')?.addEventListener('click', () => {
             aboutView.style.display = 'none';
             othersSection.style.display = 'block';
         });
 
-        document.getElementById('dua-back')?.addEventListener('click', () => {
-            duaView.style.display = 'none';
+        // التنقل لصفحة الدعاء لموتانا
+        document.getElementById('deceased-dua-btn')?.addEventListener('click', () => {
+            othersSection.style.display = 'none';
+            const deceasedView = document.getElementById('deceased-dua-view');
+            if (deceasedView) deceasedView.style.display = 'block';
+        });
+
+        document.getElementById('deceased-dua-back')?.addEventListener('click', () => {
+            const deceasedView = document.getElementById('deceased-dua-view');
+            if (deceasedView) deceasedView.style.display = 'none';
             othersSection.style.display = 'block';
         });
 
@@ -1202,163 +1181,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 14A9 9 0 0 1 9 4 9 9 0 0 0 19 20 9 9 0 0 0 21 14z"/><polygon points="18,3 18.5,4.8 20.3,4.8 18.9,5.9 19.4,7.7 18,6.6 16.6,7.7 17.1,5.9 15.7,4.8 17.5,4.8" fill="currentColor" stroke="none"/><circle cx="6" cy="10" r="0.7" fill="currentColor" stroke="none"/><circle cx="4" cy="15" r="0.5" fill="currentColor" stroke="none"/></svg>`
             }
         ];
-
-        function loadRadioStations() {
-            if (radioStationsLoaded && radioStations.length > 0) {
-                renderRadioStations(radioStations);
-                return;
-            }
-            radioStations = curatedRadioStations;
-            radioStationsLoaded = true;
-            renderRadioStations(radioStations);
-        }
-
-        function renderRadioStations(list) {
-            if (!radioStationsGrid) return;
-            radioStationsGrid.innerHTML = list.map((station, idx) => {
-                const isActive = currentRadioStation && currentRadioStation.id === station.id;
-                return `
-                    <div class="radio-station-card ${isActive ? 'active' : ''}"
-                         data-id="${station.id}"
-                         data-url="${station.url}"
-                         data-name="${station.name}"
-                         style="animation-delay: ${idx * 0.06}s">
-                        <div class="radio-station-icon" style="--station-color: ${station.color}">
-                            ${station.svgIcon}
-                        </div>
-                        <h4>${station.name}</h4>
-                        <p class="radio-station-subtitle">${station.subtitle}</p>
-                    </div>`;
-            }).join('');
-
-            radioStationsGrid.querySelectorAll('.radio-station-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const id = parseInt(card.dataset.id);
-                    const url = card.dataset.url;
-                    const name = card.dataset.name;
-                    playRadioStation({ id, url, name });
-                });
-            });
-        }
-
-        function playRadioStation(station) {
-            if (!radioAudio) return;
-
-            // نفس المحطة — وقّف أو استأنف
-            if (currentRadioStation && currentRadioStation.id === station.id) {
-                if (isRadioPlaying) {
-                    radioAudio.pause();
-                    isRadioPlaying = false;
-                    if (radioPlayerCard) radioPlayerCard.classList.remove('playing');
-                    if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
-                } else {
-                    const p = radioAudio.play();
-                    if (p !== undefined) {
-                        p.then(() => {
-                            isRadioPlaying = true;
-                            if (radioPlayerCard) radioPlayerCard.classList.add('playing');
-                            if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-stop"></i>';
-                        }).catch(() => {});
-                    }
-                }
-                return;
-            }
-
-            // محطة جديدة
-            currentRadioStation = station;
-            radioAudio.src = station.url;
-            radioAudio.volume = (radioVolumeSlider ? parseInt(radioVolumeSlider.value) : 80) / 100;
-
-            if (radioPlayerCard) radioPlayerCard.style.display = 'block';
-            if (radioStationName) radioStationName.textContent = station.name;
-            if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-            radioAudio.load();
-            const playPromise = radioAudio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    isRadioPlaying = true;
-                    if (radioPlayerCard) radioPlayerCard.classList.add('playing');
-                    if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-stop"></i>';
-                }).catch(e => {
-                    console.error('Radio play error:', e);
-                    if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
-                    isRadioPlaying = false;
-                });
-            }
-
-            // تحديث الحالة النشطة على الكروت
-            if (radioStationsGrid) {
-                radioStationsGrid.querySelectorAll('.radio-station-card').forEach(c => {
-                    c.classList.toggle('active', parseInt(c.dataset.id) === station.id);
-                });
-            }
-        }
-
-        // زر تشغيل/إيقاف في المشغل
-        if (radioPlayBtn) {
-            radioPlayBtn.addEventListener('click', () => {
-                if (!currentRadioStation) return;
-                if (isRadioPlaying) {
-                    radioAudio.pause();
-                    isRadioPlaying = false;
-                    if (radioPlayerCard) radioPlayerCard.classList.remove('playing');
-                    radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
-                } else {
-                    const p = radioAudio.play();
-                    if (p !== undefined) {
-                        p.then(() => {
-                            isRadioPlaying = true;
-                            if (radioPlayerCard) radioPlayerCard.classList.add('playing');
-                            radioPlayBtn.innerHTML = '<i class="fas fa-stop"></i>';
-                        }).catch(() => {});
-                    }
-                }
-            });
-        }
-
-        // التحكم في مستوى الصوت
-        if (radioVolumeSlider && radioAudio) {
-            radioVolumeSlider.addEventListener('input', () => {
-                radioAudio.volume = parseInt(radioVolumeSlider.value) / 100;
-            });
-        }
-
-        // أحداث الصوت
-        if (radioAudio) {
-            radioAudio.addEventListener('error', () => {
-                isRadioPlaying = false;
-                if (radioPlayerCard) radioPlayerCard.classList.remove('playing');
-                if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
-            });
-            radioAudio.addEventListener('waiting', () => {
-                if (radioPlayBtn && isRadioPlaying) {
-                    radioPlayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                }
-            });
-            radioAudio.addEventListener('playing', () => {
-                if (radioPlayBtn) radioPlayBtn.innerHTML = '<i class="fas fa-stop"></i>';
-                isRadioPlaying = true;
-                if (radioPlayerCard) radioPlayerCard.classList.add('playing');
-            });
-        }
-
-        // فتح صفحة الراديو
-        if (radioBtn) {
-            radioBtn.addEventListener('click', () => {
-                if (othersSection) othersSection.style.display = 'none';
-                if (radioView) radioView.style.display = 'block';
-                loadRadioStations();
-            });
-        }
-
-        // الرجوع من صفحة الراديو (الراديو يستمر في الخلفية)
-        if (radioBack) {
-            radioBack.addEventListener('click', () => {
-                if (radioView) radioView.style.display = 'none';
-                if (othersSection) othersSection.style.display = 'block';
-            });
-        }
 
         // لوجيك التبديل بين الفيديوهات وقوائم التشغيل
         const videoTabBtns = document.querySelectorAll('.video-tab-btn');
@@ -1783,6 +1605,14 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { salawatModal.style.display = 'none'; }, 400);
         });
 
+        // التعامل مع تنبيه الدعاء لعمي أحمد
+        if (closeCondolence) {
+            closeCondolence.addEventListener('click', () => {
+                condolenceModal.classList.remove('show');
+                setTimeout(() => { condolenceModal.style.display = 'none'; }, 400);
+            });
+        }
+
         if (tafsirEngineSelect) {
             tafsirEngineSelect.addEventListener('change', (e) => {
                 currentTafsirEdition = e.target.value;
@@ -1994,13 +1824,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    function getDuaOfTheDay() {
-        if (typeof duasData === 'undefined' || duasData.length === 0) return "اللهم بارك لنا في يومنا هذا";
-        const today = new Date();
-        const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-        const index = seed % duasData.length;
-        return duasData[index];
-    }
 
     //
     async function showTafsir(surahNum, ayahNum) {
