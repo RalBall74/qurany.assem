@@ -980,6 +980,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (videosView) videosView.style.display = 'none';
                 if (playlistModal) playlistModal.style.display = 'none';
                 if (singleVideoPlayerView) singleVideoPlayerView.style.display = 'none';
+                
+                const singleDeceasedView = document.getElementById('single-deceased-view');
+                if (singleDeceasedView) singleDeceasedView.style.display = 'none';
+                const deceasedView = document.getElementById('deceased-dua-view');
+                if (deceasedView) deceasedView.style.display = 'none';
 
                 if (playlistPlayerView) {
                     playlistPlayerView.style.display = 'none';
@@ -1038,6 +1043,97 @@ document.addEventListener('DOMContentLoaded', () => {
             const deceasedView = document.getElementById('deceased-dua-view');
             if (deceasedView) deceasedView.style.display = 'none';
             othersSection.style.display = 'block';
+        });
+
+        // لوجيك الأزرار الأربعة الخاصة بالأدعية
+        const deceasedDuasData = {
+            'btn-ahmed-kamal': {
+                name: 'أحمد كمال',
+                duas: [
+                    "اللهم إن أحمد كمال في ذمتك وحبل جوارك، فقه من فتنة القبر وعذاب النار، وأنت أهل الوفاء والحق، فاغفر له وارحمه إنك أنت الغفور الرحيم. اللهم اغفر له كل ذنب أذنبه، وعظم له كل حسنة عملها، وضاعف له الأجر حتى يبلغ الفردوس الأعلى بلا حساب ولا سابقة عذاب.",
+                    "اللهم اغفر لأحمد كمال مغفرةً تمحو بها كل خطيئة، وتجاوز عن سيئاته إنك أنت العفو الغفور، اللهم اكتب له بكل حسنة قدمها في دنياه أضعافاً مضاعفة، واجعل الفردوس الأعلى مستقراً له مع النبيين والصديقين والشهداء والصالحين.",
+                    "اللهم اجعل قبر أحمد كمال روضةً من رياض الجنة، ولا تجعله حفرة من حفر النار، اللهم أنر له في قبره، ووسع له مدخله، واغسله بالماء والثلج والبرد، ونقه من الذنوب والخطايا كما ينقى الثوب الأبيض من الدنس.",
+                    "اللهم ارحم أحمد كمال رحمةً تسع السماوات والأرض، اللهم اجزه عن الإحسان إحساناً، وعن الإساءة عفواً وغفراناً، اللهم إن كان محسناً فزد في حسناته وعظم أجرها، وإن كان مسيئاً فتجاوز عن سيئاته، وارحمه برحمتك التي وسعت كل شيء."
+                ]
+            },
+            'btn-kamal-abouelnasr': {
+                name: 'كمال أبو النصر',
+                duas: [
+                    "اللهم تقبل من كمال أبو النصر أحسن ما عمل، وتجاوز عن سيئاته، اللهم اغفر له ذنبه كله، دقه وجله، وأوله وآخره، وعلانيته وسره، اللهم ارفع درجته، وعظم أجره، وثقل موازينه، واجعله في أعلى عليين مع الأنبياء والصالحين.",
+                    "اللهم اغفر لكمال أبو النصر مغفرةً تطهر بها صحيفته، واجعل كل عمل صالح قدمه نوراً يضيء له في قبره، اللهم عامله بما أنت أهله ولا تعامله بما هو أهله، وأبدله داراً خيراً من داره، وأهلاً خيراً من أهله، وولداً خيراً من ولده.",
+                    "اللهم إن كمال أبو النصر قد نزل بك وأنت خير منزول به، فأكرم نزله ووسع مدخله، اللهم يمن كتابه، ويسر حسابه، وثقل بالحسنات ميزانه، وثبت على الصراط أقدامه، وأسكنه في أعلى الجنات، في جوار نبيك ومصطفاك.",
+                    "اللهم ارحم كمال أبو النصر برحمتك الواسعة، واغفر له ما تقدم من ذنبه وما تأخر، اللهم اجعل مرضه أو تعبه في الدنيا كفارة لجميع ذنوبه، ورفعة لدرجاته، وزيادة في حسناته التي لا تنقطع، يا أرحم الراحمين."
+                ]
+            },
+            'btn-sultan': {
+                name: 'سلطان',
+                duas: [
+                    "اللهم اغفر لسلطان وارحمه، واعف عنه، اللهم اجعل كل حسنة عملها في ميزان حسناته مضاعفة مقبولة، وكل سيئة ارتكبها مغفورة ممسوحة، اللهم ارزقه شفاعة نبيك محمد صلى الله عليه وسلم، وأورده حوضه، واسقه من يده الشريفة شربة هنيئة لا يظمأ بعدها أبداً.",
+                    "اللهم اجعل سلطان ممن يبشرون بروح وريحان، ورب غير غضبان، اللهم استقبله برحمتك ومغفرتك، وعظم له الأجر والثواب، واجعل الفردوس الأعلى مستقراً ومقاماً له، واجمعنا به في مستقر رحمتك يا أكرم الأكرمين.",
+                    "اللهم اغفر لسلطان عدد خلقك ورضا نفسك وزنة عرشك ومداد كلماتك، اللهم ضاعف له الحسنات حتى تثقل بها موازينه، وامح عنه السيئات حتى تطهر بها صحيفته، واجعله من السعداء الآمنين في قبره وفي يوم يبعثون.",
+                    "اللهم إن سلطان عبدك وابن عبدك، خرج من روح الدنيا وسعتها إلى ظلمة القبر وما هو لاقيه، اللهم آنس وحشته، وارحم غربته، وقه عذاب القبر وعذاب النار، واجعله في نعيم مقيم لا يزول ولا يحول."
+                ]
+            },
+            'btn-all-deceased': {
+                name: 'جميع الموتى',
+                duas: [
+                    "اللهم اغفر لجميع موتى المسلمين الذين شهدوا لك بالوحدانية ولنبيك بالرسالة وماتوا على ذلك، اللهم اغفر لهم جميع ذنوبهم، وعظم لهم كل حسنة عملوها، وارفع درجاتهم في المهديين، واخلفهم في عقبهم في الغابرين، واغفر لنا ولهم يا رب العالمين.",
+                    "اللهم ارحم موتانا وموتى المسلمين، اللهم اجعل قبورهم رياضاً من رياض الجنة، اللهم أنزل على قبورهم الضياء والنور والفسحة والسرور، اللهم جازهم بالحسنات إحساناً، وبالسيئات عفواً وغفراناً، حتى يكونوا في بطون الألحاد مطمئنين.",
+                    "اللهم اشمل جميع أمواتنا بعفوك ومغفرتك، اللهم إنهم قد افتقروا إلى رحمتك، وأنت غني عن عذابهم، فتجاوز عن سيئاتهم، وارفع درجاتهم، واجمعنا بهم في الفردوس الأعلى من الجنة بلا حساب ولا سابقة عذاب.",
+                    "اللهم إن موتانا في ذمتك وحبل جوارك، فقهم فتنة القبر وعذاب النار، واغفر لهم خطاياهم وذنوبهم كلها، وعظم لهم الأجور والحسنات، واجعلهم ممن قيل لهم ادخلوا الجنة أنتم وأزواجكم تحبرون، يا أرحم الراحمين."
+                ]
+            }
+        };
+
+        const singleDeceasedView = document.getElementById('single-deceased-view');
+        const singleDeceasedTitle = document.getElementById('single-deceased-title');
+        const singleDeceasedDuasContainer = document.getElementById('single-deceased-duas-container');
+
+        Object.keys(deceasedDuasData).forEach(btnId => {
+            document.getElementById(btnId)?.addEventListener('click', () => {
+                const deceasedView = document.getElementById('deceased-dua-view');
+                if (deceasedView) deceasedView.style.display = 'none';
+                
+                const data = deceasedDuasData[btnId];
+                if (singleDeceasedTitle) singleDeceasedTitle.textContent = data.name;
+                if (singleDeceasedDuasContainer) {
+                    singleDeceasedDuasContainer.innerHTML = data.duas.map((dua, index) => {
+                        const storageKey = `amen_count_${btnId}_${index}`;
+                        const savedCount = localStorage.getItem(storageKey) || 0;
+                        return `
+                        <div class="deceased-dua-item">
+                            <p class="dua-text-content">${dua}</p>
+                            <div class="dua-action-bar">
+                                <button class="amen-btn" data-key="${storageKey}">
+                                    آمين 🤲 <span class="amen-counter">${savedCount}</span>
+                                </button>
+                            </div>
+                        </div>
+                    `}).join('');
+                    
+                    const amenBtns = singleDeceasedDuasContainer.querySelectorAll('.amen-btn');
+                    amenBtns.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const key = this.getAttribute('data-key');
+                            let count = parseInt(localStorage.getItem(key)) || 0;
+                            count++;
+                            localStorage.setItem(key, count);
+                            this.querySelector('.amen-counter').textContent = count;
+                            
+                            this.classList.add('clicked');
+                            setTimeout(() => this.classList.remove('clicked'), 300);
+                        });
+                    });
+                }
+                
+                if (singleDeceasedView) singleDeceasedView.style.display = 'block';
+            });
+        });
+
+        document.getElementById('single-deceased-back')?.addEventListener('click', () => {
+            if (singleDeceasedView) singleDeceasedView.style.display = 'none';
+            const deceasedView = document.getElementById('deceased-dua-view');
+            if (deceasedView) deceasedView.style.display = 'block';
         });
 
         if (prayerBack) {
