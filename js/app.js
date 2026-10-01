@@ -36,8 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchTypeLabel = document.getElementById('search-type-label');
     const salawatModal = document.getElementById('salawat-modal');
     const closeSalawat = document.getElementById('close-salawat');
-    const condolenceModal = document.getElementById('condolence-modal');
-    const closeCondolence = document.getElementById('close-condolence');
+
     const othersSection = document.getElementById('others-section');
     const athkarView = document.getElementById('athkar-view');
     const aboutView = document.getElementById('about-view');
@@ -83,6 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const sharePreview = document.getElementById('share-card-preview');
     const downloadCardBtn = document.getElementById('download-card-btn');
     const nativeShareBtn = document.getElementById('native-share-btn');
+    const athkarMorningEveningView = document.getElementById('athkar-morning-evening-view');
+    const asmaAllahView = document.getElementById('asma-allah-view');
 
     // حالة التطبيق والحاجات اللي بتتحفظ
     let surahs = [];
@@ -242,15 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // تحديث بطاقة الترحيب والتحية
         updateHeroCard();
 
-        // عرض تنبيه الدعاء لعمي أحمد عند فتح التطبيق
-        setTimeout(() => {
-            if (condolenceModal) {
-                condolenceModal.style.display = 'flex';
-                setTimeout(() => {
-                    condolenceModal.classList.add('show');
-                }, 10);
-            }
-        }, 1500);
     }
 
 
@@ -337,11 +329,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    function updateOnlineStatus() {
+    async function updateOnlineStatus() {
         if (!navigator.onLine) {
             offlineBanner.style.display = 'flex';
         } else {
             offlineBanner.style.display = 'none';
+        }
+        await updateOfflineRepeatMode();
+    }
+
+    // فحص السور المحملة بدون انترنت
+    async function getOfflineAudioInfo() {
+        try {
+            const cache = await caches.open('quran-audio-v1');
+            const keys = await cache.keys();
+            const totalDownloaded = keys.length;
+
+            const reciterDownloaded = [];
+            if (surahs && surahs.length > 0 && reciter && reciter.server) {
+                for (let i = 0; i < surahs.length; i++) {
+                    const s = surahs[i];
+                    const formattedNumber = String(s.number).padStart(3, '0');
+                    const url = `${reciter.server}${formattedNumber}.mp3`;
+                    const match = await cache.match(url);
+                    if (match) {
+                        reciterDownloaded.push({ surah: s, index: i, url });
+                    }
+                }
+            }
+
+            return {
+                totalDownloaded,
+                reciterDownloaded
+            };
+        } catch (e) {
+            console.error('Error checking offline audio info:', e);
+            return { totalDownloaded: 0, reciterDownloaded: [] };
+        }
+    }
+
+    // تفعيل التكرار التلقائي إذا كان النت فاصلاً وسورة واحدة فقط محملة
+    async function updateOfflineRepeatMode() {
+        if (!playerAudio) return false;
+
+        const bannerText = offlineBanner ? offlineBanner.querySelector('span') : null;
+
+        if (!navigator.onLine) {
+            const { totalDownloaded, reciterDownloaded } = await getOfflineAudioInfo();
+            // لو النت فاصل ومحمل سورة واحدة فقط (أو سورة واحدة للقارئ الحالي)
+            if (totalDownloaded === 1 || reciterDownloaded.length <= 1) {
+                playerAudio.loop = true;
+                if (bannerText) {
+                    bannerText.textContent = t('لا يوجد اتصال بالإنترنت - يتم تكرار السورة المحملة تلقائياً');
+                }
+                return true;
+            } else {
+                playerAudio.loop = false;
+                if (bannerText) {
+                    bannerText.textContent = t('لا يوجد اتصال بالإنترنت - تعمل فقط السور المحملة');
+                }
+                return false;
+            }
+        } else {
+            playerAudio.loop = false;
+            if (bannerText) {
+                bannerText.textContent = t('لا يوجد اتصال بالإنترنت - تعمل فقط السور المحملة');
+            }
+            return false;
         }
     }
 
@@ -490,6 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupMediaSession(surah);
 
         checkDownloadStatus(audioUrl);
+        updateOfflineRepeatMode();
         savePlaybackState();
 
         // أظهر المشغل فور اختيار السورة
@@ -619,48 +674,66 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function playNext() {
-        if (curIdx >= surahs.length - 1) return;
-
         if (!navigator.onLine) {
-            // لو مفيش نت، دور على السورة اللي بعدها وتكون متحملة فعلاً
-            const cache = await caches.open('quran-audio-v1');
-            for (let i = curIdx + 1; i < surahs.length; i++) {
-                const s = surahs[i];
-                const formattedNumber = String(s.number).padStart(3, '0');
-                const url = `${reciter.server}${formattedNumber}.mp3`;
-                const match = await cache.match(url);
-                if (match) {
-                    playSurah(s, i);
-                    return;
-                }
+            const { totalDownloaded, reciterDownloaded } = await getOfflineAudioInfo();
+
+            // لو مفيش غير سورة واحدة بس متحملة، يتم تكرارها وعدم إغلاق المشغل
+            if (totalDownloaded === 1 || reciterDownloaded.length <= 1) {
+                playerAudio.currentTime = 0;
+                playerAudio.play();
+                playerAudio.loop = true;
+                return;
             }
-            // لو وصلنا هنا يبقى مفيش سور تانية متحملة تحت دي
-            // alert('لا توجد سور محملة تالية للتشغيل أوفلاين.');
+
+            // لو محمل أكتر من سورة، دور على السورة التالية بعد السورة الحالية
+            const nextSurah = reciterDownloaded.find(item => item.index > curIdx);
+            if (nextSurah) {
+                playSurah(nextSurah.surah, nextSurah.index);
+                return;
+            }
+
+            // لو وصلنا لآخر سورة محملة، لف وارجع لأول سورة محملة لتشغيل مستمر
+            if (reciterDownloaded.length > 0) {
+                playSurah(reciterDownloaded[0].surah, reciterDownloaded[0].index);
+                return;
+            }
+
+            playerAudio.currentTime = 0;
+            playerAudio.play();
         } else {
-            // لو فيه نت بنشتغل طبيعي خالص
+            if (curIdx >= surahs.length - 1) return;
             playSurah(surahs[curIdx + 1], curIdx + 1);
         }
     }
 
     async function playPrev() {
-        if (curIdx <= 0) return;
-
         if (!navigator.onLine) {
-            // لو مفيش نت، هندور على السورة اللي قبلها وتكون متحملة فعلاً
-            const cache = await caches.open('quran-audio-v1');
-            for (let i = curIdx - 1; i >= 0; i--) {
-                const s = surahs[i];
-                const formattedNumber = String(s.number).padStart(3, '0');
-                const url = `${reciter.server}${formattedNumber}.mp3`;
-                const match = await cache.match(url);
-                if (match) {
-                    playSurah(s, i);
-                    return;
-                }
+            const { totalDownloaded, reciterDownloaded } = await getOfflineAudioInfo();
+
+            if (totalDownloaded === 1 || reciterDownloaded.length <= 1) {
+                playerAudio.currentTime = 0;
+                playerAudio.play();
+                playerAudio.loop = true;
+                return;
             }
-            // لو وصلنا هنا يبقى مفيش سور تانية متحملة فوق دي
+
+            const prevSurahs = reciterDownloaded.filter(item => item.index < curIdx);
+            if (prevSurahs.length > 0) {
+                const prev = prevSurahs[prevSurahs.length - 1];
+                playSurah(prev.surah, prev.index);
+                return;
+            }
+
+            if (reciterDownloaded.length > 0) {
+                const last = reciterDownloaded[reciterDownloaded.length - 1];
+                playSurah(last.surah, last.index);
+                return;
+            }
+
+            playerAudio.currentTime = 0;
+            playerAudio.play();
         } else {
-            // لو فيه نت بنشتغل طبيعي
+            if (curIdx <= 0) return;
             playSurah(surahs[curIdx - 1], curIdx - 1);
         }
     }
@@ -878,6 +951,266 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
     }
 
+    // ============================================================
+    // بيانات أذكار الصباح والمساء
+    // ============================================================
+    const morningEveningAthkar = {
+        morning: [
+            { text: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.", ref: "رواه مسلم", count: 1 },
+            { text: "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ.", ref: "رواه الترمذي", count: 1 },
+            { text: "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ.", ref: "سيد الاستغفار - رواه البخاري", count: 1 },
+            { text: "اللَّهُمَّ إِنِّي أَصْبَحْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلَائِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَهَ إِلَّا أَنْتَ وَحْدَكَ لَا شَرِيكَ لَكَ، وَأَنَّ مُحَمَّدًا عَبْدُكَ وَرَسُولُكَ.", ref: "رواه أبو داود", count: 4 },
+            { text: "اللَّهُمَّ مَا أَصْبَحَ بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ، فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ.", ref: "رواه أبو داود", count: 1 },
+            { text: "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ.", ref: "رواه أبو داود والترمذي", count: 3 },
+            { text: "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا.", ref: "رواه أبو داود والترمذي", count: 3 },
+            { text: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ.", ref: "رواه الحاكم", count: 1 },
+            { text: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ.", ref: "رواه مسلم", count: 3 },
+            { text: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي.", ref: "رواه أبو داود وابن ماجه", count: 1 },
+            { text: "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ.", ref: "رواه أبو داود", count: 3 },
+            { text: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لَا إِلَهَ إِلَّا أَنْتَ.", ref: "رواه أبو داود والنسائي", count: 3 },
+            { text: "حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ.", ref: "رواه أبو داود", count: 7 },
+            { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ.", ref: "رواه مسلم - من قالها مئة مرة حُطَّت خطاياه", count: 100 },
+            { text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.", ref: "رواه البخاري ومسلم", count: 10 }
+        ],
+        evening: [
+            { text: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.", ref: "رواه مسلم", count: 1 },
+            { text: "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ.", ref: "رواه الترمذي", count: 1 },
+            { text: "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ.", ref: "سيد الاستغفار - رواه البخاري", count: 1 },
+            { text: "اللَّهُمَّ إِنِّي أَمْسَيْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلَائِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَهَ إِلَّا أَنْتَ وَحْدَكَ لَا شَرِيكَ لَكَ، وَأَنَّ مُحَمَّدًا عَبْدُكَ وَرَسُولُكَ.", ref: "رواه أبو داود", count: 4 },
+            { text: "اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ، فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ.", ref: "رواه أبو داود", count: 1 },
+            { text: "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ.", ref: "رواه أبو داود والترمذي", count: 3 },
+            { text: "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا.", ref: "رواه أبو داود والترمذي", count: 3 },
+            { text: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ.", ref: "رواه الحاكم", count: 1 },
+            { text: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ.", ref: "رواه مسلم", count: 3 },
+            { text: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ.", ref: "رواه أبو داود وابن ماجه", count: 1 },
+            { text: "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ.", ref: "رواه أبو داود", count: 3 },
+            { text: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لَا إِلَهَ إِلَّا أَنْتَ.", ref: "رواه أبو داود والنسائي", count: 3 },
+            { text: "حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ.", ref: "رواه أبو داود", count: 7 },
+            { text: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَأَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ، وَأَعُوذُ بِكَ مِنَ الْجُبْنِ وَالْبُخْلِ، وَأَعُوذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ.", ref: "رواه البخاري", count: 1 },
+            { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ.", ref: "رواه مسلم - من قالها مئة مرة حُطَّت خطاياه", count: 100 }
+        ]
+    };
+
+    let currentAthkarType = 'morning';
+    let athkarDoneState = {};
+
+    function renderAthkarPage(type) {
+        currentAthkarType = type;
+        const listEl = document.getElementById('athkar-list');
+        const items = morningEveningAthkar[type] || [];
+        const storageKey = `athkar_done_${type}_${new Date().toDateString()}`;
+        athkarDoneState = JSON.parse(localStorage.getItem(storageKey)) || {};
+
+        // تحديث الـ tabs
+        document.querySelectorAll('.athkar-tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.athkar === type);
+        });
+
+        listEl.innerHTML = items.map((item, index) => {
+            const currentCount = athkarDoneState[index] || 0;
+            const isDone = currentCount >= item.count;
+            return `
+                <div class="athkar-item-card ${isDone ? 'done' : ''}" data-index="${index}" data-required="${item.count}">
+                    <div class="athkar-item-text">${item.text}</div>
+                    <div class="athkar-item-footer">
+                        <span class="athkar-item-ref"><i class="fas fa-book-open"></i> ${item.ref}</span>
+                        <div class="athkar-item-counter-area">
+                            <span class="athkar-item-progress">${currentCount}/${item.count}</span>
+                            <button class="athkar-item-btn ${isDone ? 'done' : ''}" onclick="handleAthkarClick(${index})">
+                                ${isDone ? '<i class="fas fa-check"></i> أتممت' : '<i class="fas fa-plus"></i> ' + (item.count > 1 ? `${item.count - currentCount} مرات` : 'تم')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        updateAthkarProgress(type);
+
+        // تفعيل الـ tabs
+        document.querySelectorAll('.athkar-tab-btn').forEach(btn => {
+            btn.onclick = () => renderAthkarPage(btn.dataset.athkar);
+        });
+    }
+
+    window.handleAthkarClick = function(index) {
+        const type = currentAthkarType;
+        const item = morningEveningAthkar[type][index];
+        const storageKey = `athkar_done_${type}_${new Date().toDateString()}`;
+        athkarDoneState = JSON.parse(localStorage.getItem(storageKey)) || {};
+
+        let currentCount = athkarDoneState[index] || 0;
+        if (currentCount < item.count) {
+            currentCount++;
+            athkarDoneState[index] = currentCount;
+            localStorage.setItem(storageKey, JSON.stringify(athkarDoneState));
+        }
+
+        // تحديث الكارت مباشرة
+        const card = document.querySelector(`.athkar-item-card[data-index="${index}"]`);
+        if (!card) return;
+        const isDone = currentCount >= item.count;
+        card.classList.toggle('done', isDone);
+        const progressEl = card.querySelector('.athkar-item-progress');
+        const btnEl = card.querySelector('.athkar-item-btn');
+        if (progressEl) progressEl.textContent = `${currentCount}/${item.count}`;
+        if (btnEl) {
+            btnEl.classList.toggle('done', isDone);
+            btnEl.innerHTML = isDone
+                ? '<i class="fas fa-check"></i> أتممت'
+                : `<i class="fas fa-plus"></i> ${item.count > 1 ? (item.count - currentCount) + ' مرات' : 'تم'}`;
+        }
+
+        // نبضة تفاعلية
+        card.classList.add('pulse-once');
+        setTimeout(() => card.classList.remove('pulse-once'), 400);
+
+        updateAthkarProgress(type);
+    };
+
+    function updateAthkarProgress(type) {
+        const items = morningEveningAthkar[type] || [];
+        const storageKey = `athkar_done_${type}_${new Date().toDateString()}`;
+        const done = JSON.parse(localStorage.getItem(storageKey)) || {};
+        const doneCount = items.filter((item, i) => (done[i] || 0) >= item.count).length;
+        const totalCount = items.length;
+
+        const doneEl = document.getElementById('athkar-done-count');
+        const totalEl = document.getElementById('athkar-total-count');
+        const fillEl = document.getElementById('athkar-progress-fill');
+        if (doneEl) doneEl.textContent = doneCount;
+        if (totalEl) totalEl.textContent = totalCount;
+        if (fillEl) fillEl.style.width = `${(doneCount / totalCount) * 100}%`;
+    }
+
+    // ============================================================
+    // بيانات أسماء الله الحسنى الـ 99
+    // ============================================================
+    const asmaAllahData = [
+        { number: 1, name: "الله", meaning: "الاسم الجامع لجميع صفات الكمال والجلال والجمال" },
+        { number: 2, name: "الرَّحْمَن", meaning: "ذو الرحمة الواسعة التي تشمل جميع الخلق في الدنيا" },
+        { number: 3, name: "الرَّحِيم", meaning: "ذو الرحمة الخاصة بالمؤمنين في الآخرة" },
+        { number: 4, name: "الْمَلِك", meaning: "المالك لجميع الملك والمتصرف فيه بلا منازع" },
+        { number: 5, name: "الْقُدُّوس", meaning: "المنزَّه عن كل نقص وعيب، الطاهر من كل سوء" },
+        { number: 6, name: "السَّلَام", meaning: "السالم من كل نقص والذي يُفيض السلامة على خلقه" },
+        { number: 7, name: "الْمُؤْمِن", meaning: "الذي آمن أولياءه من عذابه وصدَّق رسله" },
+        { number: 8, name: "الْمُهَيْمِن", meaning: "الرقيب الحفيظ على كل شيء، المسيطر على الخلق" },
+        { number: 9, name: "الْعَزِيز", meaning: "الغالب القاهر الذي لا يُذَلُّ ولا يُغلَب" },
+        { number: 10, name: "الْجَبَّار", meaning: "الذي جبَر المكسور وأصلح الضعيف، وقهر العباد بقدرته" },
+        { number: 11, name: "الْمُتَكَبِّر", meaning: "المتعالي بعظمته عن كل ما لا يليق بجلاله" },
+        { number: 12, name: "الْخَالِق", meaning: "الموجِد للأشياء على غير مثال سابق" },
+        { number: 13, name: "الْبَارِئ", meaning: "الذي برأ الخلق وخلقهم بريئين من التفاوت والاختلال" },
+        { number: 14, name: "الْمُصَوِّر", meaning: "الذي صوَّر جميع المخلوقات وأعطى كل شيء صورته" },
+        { number: 15, name: "الْغَفَّار", meaning: "الكثير المغفرة الذي يغفر الذنوب مرة بعد مرة" },
+        { number: 16, name: "الْقَهَّار", meaning: "القاهر لكل شيء الغالب على أمره لا يعجزه شيء" },
+        { number: 17, name: "الْوَهَّاب", meaning: "كثير الهبات والعطايا الذي يهب بلا عوض ولا حساب" },
+        { number: 18, name: "الرَّزَّاق", meaning: "الذي يرزق جميع خلقه ويتكفل بأقواتهم" },
+        { number: 19, name: "الْفَتَّاح", meaning: "الذي يفتح أبواب الرزق والرحمة والفرج لعباده" },
+        { number: 20, name: "الْعَلِيم", meaning: "المحيط علمه بجميع الأشياء ظاهرها وباطنها" },
+        { number: 21, name: "الْقَابِض", meaning: "الذي يقبض الأرزاق والأرواح بحكمته وعدله" },
+        { number: 22, name: "الْبَاسِط", meaning: "الذي يبسط الرزق ويوسعه على من يشاء بفضله" },
+        { number: 23, name: "الْخَافِض", meaning: "الذي يخفض المتكبرين والطغاة وأهل الكفر" },
+        { number: 24, name: "الرَّافِع", meaning: "الذي يرفع المؤمنين والأولياء بطاعتهم له" },
+        { number: 25, name: "الْمُعِزّ", meaning: "الذي يُعز من يشاء بالنصر والتأييد والتوفيق" },
+        { number: 26, name: "الْمُذِلّ", meaning: "الذي يُذِل من يشاء من الظالمين والمتكبرين" },
+        { number: 27, name: "السَّمِيع", meaning: "الذي يسمع جميع الأصوات سرها وعلنها" },
+        { number: 28, name: "الْبَصِير", meaning: "الذي يبصر جميع الأشياء دقيقها وجليلها" },
+        { number: 29, name: "الْحَكَم", meaning: "الذي يحكم بين عباده بالعدل والقسط" },
+        { number: 30, name: "الْعَدْل", meaning: "الذي لا يجور في أحكامه ويُعطي كل ذي حق حقه" },
+        { number: 31, name: "اللَّطِيف", meaning: "الذي يعلم دقائق الأمور ويُوصل الخير لعباده برفق" },
+        { number: 32, name: "الْخَبِير", meaning: "العليم بحقائق الأشياء الباطنة والخافية" },
+        { number: 33, name: "الْحَلِيم", meaning: "الذي لا يُعاجل العصاة بالعقوبة ويمهل لعلهم يتوبون" },
+        { number: 34, name: "الْعَظِيم", meaning: "ذو العظمة الكاملة في ذاته وصفاته وأفعاله" },
+        { number: 35, name: "الْغَفُور", meaning: "الذي يغفر الذنوب ويسترها ولا يعاقب عليها" },
+        { number: 36, name: "الشَّكُور", meaning: "الذي يُثيب على القليل من العمل بالكثير من الجزاء" },
+        { number: 37, name: "الْعَلِيّ", meaning: "المتعالي على خلقه بذاته وقهره وقدرته" },
+        { number: 38, name: "الْكَبِير", meaning: "الكبير في ذاته وصفاته فوق كل تصور وإدراك" },
+        { number: 39, name: "الْحَفِيظ", meaning: "الذي يحفظ الأشياء ويحصيها ولا يضيع عنده شيء" },
+        { number: 40, name: "الْمُقِيت", meaning: "الذي يُقيت عباده ويُوصل إلى كل نفس قوتها" },
+        { number: 41, name: "الْحَسِيب", meaning: "الكافي لعباده والمحاسِب لهم على أعمالهم" },
+        { number: 42, name: "الْجَلِيل", meaning: "ذو الجلال والعظمة والكبرياء" },
+        { number: 43, name: "الْكَرِيم", meaning: "الواسع الكرم والعطاء الذي يعطي بغير حساب" },
+        { number: 44, name: "الرَّقِيب", meaning: "المطَّلع على كل شيء لا يغيب عنه شيء" },
+        { number: 45, name: "الْمُجِيب", meaning: "الذي يُجيب دعاء من دعاه ويستجيب له" },
+        { number: 46, name: "الْوَاسِع", meaning: "الواسع الرحمة والعلم والفضل والقدرة" },
+        { number: 47, name: "الْحَكِيم", meaning: "الذي يضع الأشياء في مواضعها بالغ الحكمة" },
+        { number: 48, name: "الْوَدُود", meaning: "الذي يحب عباده المؤمنين ويحبونه" },
+        { number: 49, name: "الْمَجِيد", meaning: "ذو المجد والشرف والعظمة في ذاته وأفعاله" },
+        { number: 50, name: "الْبَاعِث", meaning: "الذي يبعث الخلق للحساب يوم القيامة" },
+        { number: 51, name: "الشَّهِيد", meaning: "الذي لا يغيب عنه شيء وهو شاهد على كل شيء" },
+        { number: 52, name: "الْحَقّ", meaning: "الثابت الوجود الدائم الذي لا يزول" },
+        { number: 53, name: "الْوَكِيل", meaning: "الكافي لمن توكل عليه والقائم بأمور عباده" },
+        { number: 54, name: "الْقَوِيّ", meaning: "ذو القوة التامة الكاملة التي لا تُعجزها شيء" },
+        { number: 55, name: "الْمَتِين", meaning: "الشديد القوة والقدرة الذي لا تُنهك قوته" },
+        { number: 56, name: "الْوَلِيّ", meaning: "الناصر لعباده المؤمنين ومتولي أمورهم" },
+        { number: 57, name: "الْحَمِيد", meaning: "المحمود في أفعاله وصفاته وأسمائه" },
+        { number: 58, name: "الْمُحْصِي", meaning: "الذي أحصى كل شيء وعَلِم عدده" },
+        { number: 59, name: "الْمُبْدِئ", meaning: "الذي ابتدأ الخلق وأوجده من العدم" },
+        { number: 60, name: "الْمُعِيد", meaning: "الذي يُعيد الخلق بعد فنائه يوم البعث" },
+        { number: 61, name: "الْمُحْيِي", meaning: "الذي يُحيي الأموات وينفخ الأرواح في الأجساد" },
+        { number: 62, name: "الْمُمِيت", meaning: "الذي يُميت من يشاء من خلقه متى يشاء" },
+        { number: 63, name: "الْحَيّ", meaning: "الذي له الحياة الكاملة الدائمة الأزلية الأبدية" },
+        { number: 64, name: "الْقَيُّوم", meaning: "القائم بنفسه والقائم على كل شيء بتدبيره" },
+        { number: 65, name: "الْوَاجِد", meaning: "الغني الذي لا يفتقر لشيء ويجد كل ما يريد" },
+        { number: 66, name: "الْمَاجِد", meaning: "ذو المجد والسعة في الصفات والكرم" },
+        { number: 67, name: "الْوَاحِد", meaning: "المنفرد بالوحدانية لا شريك له ولا نظير" },
+        { number: 68, name: "الأَحَد", meaning: "المتفرد بالأحدية الصمدية الكاملة" },
+        { number: 69, name: "الصَّمَد", meaning: "السيد الذي يُصمَد إليه في الحوائج والمطالب" },
+        { number: 70, name: "الْقَادِر", meaning: "ذو القدرة التامة على كل شيء بلا عجز" },
+        { number: 71, name: "الْمُقْتَدِر", meaning: "الذي بلغت قدرته غايتها فلا يعجزه شيء" },
+        { number: 72, name: "الْمُقَدِّم", meaning: "الذي يُقدم من يشاء بفضله ويُعليه" },
+        { number: 73, name: "الْمُؤَخِّر", meaning: "الذي يُؤخر من يشاء بحكمته وعدله" },
+        { number: 74, name: "الأَوَّل", meaning: "الذي ليس قبله شيء الأزلي في وجوده" },
+        { number: 75, name: "الآخِر", meaning: "الذي ليس بعده شيء الأبدي في وجوده" },
+        { number: 76, name: "الظَّاهِر", meaning: "الذي ظهر للعقول بآياته وبيناته فوق كل شيء" },
+        { number: 77, name: "الْبَاطِن", meaning: "المحتجب عن الأبصار فلا يُرى في الدنيا" },
+        { number: 78, name: "الْوَالِي", meaning: "المالك لجميع الأشياء المتصرف فيها" },
+        { number: 79, name: "الْمُتَعَالِ", meaning: "الذي تعالى وتنزَّه عن كل نقص وعيب" },
+        { number: 80, name: "الْبَرّ", meaning: "الواسع الرحمة والإحسان والبر بعباده" },
+        { number: 81, name: "التَّوَّاب", meaning: "الذي يتوب على عباده ويقبل توبتهم مرة بعد مرة" },
+        { number: 82, name: "الْمُنْتَقِم", meaning: "الذي ينتقم من أهل الكفر والظلم بعدله" },
+        { number: 83, name: "الْعَفُوّ", meaning: "الذي يمحو الذنوب ويتجاوز عن سيئات عباده" },
+        { number: 84, name: "الرَّؤُوف", meaning: "الشديد الرحمة والرأفة بعباده" },
+        { number: 85, name: "مَالِكُ الْمُلْك", meaning: "صاحب الملك الحقيقي يُؤتيه من يشاء وينزعه ممن يشاء" },
+        { number: 86, name: "ذُو الْجَلَالِ وَالإِكْرَام", meaning: "ذو العظمة والكبرياء والإكرام لأوليائه" },
+        { number: 87, name: "الْمُقْسِط", meaning: "العادل في أحكامه الذي يُقسط بين عباده" },
+        { number: 88, name: "الْجَامِع", meaning: "الذي يجمع الخلائق ليوم الحساب" },
+        { number: 89, name: "الْغَنِيّ", meaning: "الغني بذاته عن جميع خلقه لا يحتاج لأحد" },
+        { number: 90, name: "الْمُغْنِي", meaning: "الذي يُغني من يشاء من خلقه بفضله وكرمه" },
+        { number: 91, name: "الْمَانِع", meaning: "الذي يمنع ما يشاء بحكمته حمايةً لعباده" },
+        { number: 92, name: "الضَّارّ", meaning: "الذي ينفع ويضر بحكمته وتقديره لا يملك أحد غيره ذلك" },
+        { number: 93, name: "النَّافِع", meaning: "الذي يُنزل النفع بعباده بفضله وإحسانه" },
+        { number: 94, name: "النُّور", meaning: "الذي نوَّر السماوات والأرض وهدى القلوب" },
+        { number: 95, name: "الْهَادِي", meaning: "الذي يهدي من يشاء إلى الحق والصراط المستقيم" },
+        { number: 96, name: "الْبَدِيع", meaning: "الذي أبدع الخلق وابتكره على غير مثال سابق" },
+        { number: 97, name: "الْبَاقِي", meaning: "الدائم الوجود الذي لا يفنى ولا يزول" },
+        { number: 98, name: "الْوَارِث", meaning: "الباقي بعد فناء خلقه الذي يرث الأرض ومن عليها" },
+        { number: 99, name: "الرَّشِيد", meaning: "الذي أرشد خلقه إلى ما فيه صلاحهم بهداه" }
+    ];
+
+    function renderAsmaAllah(filter = '') {
+        const grid = document.getElementById('asma-allah-grid');
+        if (!grid) return;
+        const filtered = filter
+            ? asmaAllahData.filter(a => a.name.includes(filter) || a.meaning.includes(filter))
+            : asmaAllahData;
+
+        grid.innerHTML = filtered.map(asma => `
+            <div class="asma-card">
+                <div class="asma-number">${asma.number}</div>
+                <div class="asma-name">${asma.name}</div>
+                <div class="asma-meaning">${asma.meaning}</div>
+            </div>
+        `).join('');
+
+        // بحث
+        const searchInput = document.getElementById('asma-search-input');
+        if (searchInput) {
+            searchInput.oninput = (e) => renderAsmaAllah(e.target.value.trim());
+        }
+    }
+
+
     // تنبيه الصلاة على النبي كل 5 دقايق عشان ناخد ثواب
     setInterval(() => {
         if (salawatModal.style.display !== 'flex') {
@@ -978,6 +1311,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rosaryView) rosaryView.style.display = 'none';
                 if (prayerView) prayerView.style.display = 'none';
                 if (videosView) videosView.style.display = 'none';
+                if (athkarMorningEveningView) athkarMorningEveningView.style.display = 'none';
+                if (asmaAllahView) asmaAllahView.style.display = 'none';
                 if (playlistModal) playlistModal.style.display = 'none';
                 if (singleVideoPlayerView) singleVideoPlayerView.style.display = 'none';
                 
@@ -1016,6 +1351,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // التنقل بين الأقسام الفرعية في صفحة "أخرى"
+        // التنقل بين الأقسام الفرعية في صفحة "أخرى"
+        document.getElementById('athkar-morning-evening-btn')?.addEventListener('click', () => {
+            othersSection.style.display = 'none';
+            athkarMorningEveningView.style.display = 'block';
+            renderAthkarPage('morning');
+        });
+
+        document.getElementById('athkar-morning-evening-back')?.addEventListener('click', () => {
+            athkarMorningEveningView.style.display = 'none';
+            othersSection.style.display = 'block';
+        });
+
+        document.getElementById('asma-allah-btn')?.addEventListener('click', () => {
+            othersSection.style.display = 'none';
+            asmaAllahView.style.display = 'block';
+            renderAsmaAllah();
+        });
+
+        document.getElementById('asma-allah-back')?.addEventListener('click', () => {
+            asmaAllahView.style.display = 'none';
+            othersSection.style.display = 'block';
+        });
+
         document.getElementById('athkar-btn')?.addEventListener('click', () => {
             othersSection.style.display = 'none';
             athkarView.style.display = 'block';
@@ -1805,13 +2163,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { salawatModal.style.display = 'none'; }, 400);
         });
 
-        // التعامل مع تنبيه الدعاء لعمي أحمد
-        if (closeCondolence) {
-            closeCondolence.addEventListener('click', () => {
-                condolenceModal.classList.remove('show');
-                setTimeout(() => { condolenceModal.style.display = 'none'; }, 400);
-            });
-        }
 
         if (tafsirEngineSelect) {
             tafsirEngineSelect.addEventListener('change', (e) => {
@@ -2100,6 +2451,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (confirm(t('هل تريد حذف السورة من التحميلات؟'))) {
                         await cache.delete(url);
                         checkDownloadStatus(url);
+                        updateOfflineRepeatMode();
                     }
                 };
             } else {
@@ -2153,6 +2505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // نحدث شكل الزرار لما نخلص التحميل بنجاح ونظهر علامة الصح الشيك
             checkDownloadStatus(url);
+            updateOfflineRepeatMode();
 
         } catch (error) {
             console.error('[Download] فشل التحميل:', error);

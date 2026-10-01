@@ -239,22 +239,20 @@
                 </div>
                 <div class="others-grid">
 
-                    <div class="other-card" id="deceased-dua-btn">
-                        <div class="other-icon"><i class="fas fa-praying-hands"></i></div>
-                        <div class="other-info">
-                            <h3>الدعاء لموتانا</h3>
-                            <p>ادعوا لهم بالرحمة والمغفرة</p>
-                        </div>
-                        <i class="fas fa-chevron-left"></i>
-                    </div>
-
-
-
                     <div class="other-card" id="about-dev-btn">
                         <div class="other-icon"><i class="fas fa-user-tie"></i></div>
                         <div class="other-info">
                             <h3>عن المطور</h3>
                             <p>معلومات عن مبرمج التطبيق</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+                    <div class="other-card" id="deceased-dua-btn">
+                        <div class="other-icon"><i class="fas fa-praying-hands"></i></div>
+                        <div class="other-info">
+                            <h3>الدعاء لموتانا</h3>
+                            <p>ادعوا لهم بالرحمة والمغفرة</p>
                         </div>
                         <i class="fas fa-chevron-left"></i>
                     </div>
@@ -282,6 +280,24 @@
                         <div class="other-info">
                             <h3>فيديوهات دينية</h3>
                             <p>شاهد فيديوهات وقوائم تشغيل دينية</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+                    <div class="other-card" id="athkar-morning-evening-btn">
+                        <div class="other-icon"><i class="fas fa-cloud-sun"></i></div>
+                        <div class="other-info">
+                            <h3>أذكار الصباح والمساء</h3>
+                            <p>أذكارك اليومية من السنة النبوية</p>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+
+                    <div class="other-card" id="asma-allah-btn">
+                        <div class="other-icon"><i class="fas fa-star-and-crescent"></i></div>
+                        <div class="other-info">
+                            <h3>أسماء الله الحسنى</h3>
+                            <p>تعرّف على الأسماء الـ 99 ومعانيها</p>
                         </div>
                         <i class="fas fa-chevron-left"></i>
                     </div>
@@ -567,6 +583,51 @@
                 </div>
             </section>
 
+            <!-- أذكار الصباح والمساء -->
+            <section id="athkar-morning-evening-view" class="others-subview page-animate" style="display: none;">
+                <div class="view-header">
+                    <button class="back-btn" id="athkar-morning-evening-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>أذكار الصباح والمساء</h2>
+                </div>
+                <!-- تبويبات الصباح والمساء -->
+                <div class="athkar-tabs-container">
+                    <div class="athkar-tabs">
+                        <button class="athkar-tab-btn active" data-athkar="morning">
+                            <i class="fas fa-sun"></i>
+                            أذكار الصباح
+                        </button>
+                        <button class="athkar-tab-btn" data-athkar="evening">
+                            <i class="fas fa-moon"></i>
+                            أذكار المساء
+                        </button>
+                    </div>
+                </div>
+                <div id="athkar-progress-bar" class="athkar-progress-bar">
+                    <div id="athkar-progress-fill" class="athkar-progress-fill"></div>
+                </div>
+                <div id="athkar-counter-display" class="athkar-counter-display">
+                    <span id="athkar-done-count">0</span> / <span id="athkar-total-count">0</span> ذكر مكتمل
+                </div>
+                <div id="athkar-list" class="athkar-list">
+                    <!-- الأذكار هتظهر هنا بالـ JS -->
+                </div>
+            </section>
+
+            <!-- أسماء الله الحسنى -->
+            <section id="asma-allah-view" class="others-subview page-animate" style="display: none;">
+                <div class="view-header">
+                    <button class="back-btn" id="asma-allah-back"><i class="fas fa-arrow-right"></i></button>
+                    <h2>أسماء الله الحسنى</h2>
+                </div>
+                <div class="asma-search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="asma-search-input" placeholder="ابحث عن اسم..." autocomplete="off">
+                </div>
+                <div id="asma-allah-grid" class="asma-allah-grid">
+                    <!-- الأسماء هتظهر هنا بالـ JS -->
+                </div>
+            </section>
+
 
             <div id="ayah-viewer" class="ayah-viewer">
                 <div class="ayah-header">
@@ -727,18 +788,6 @@
         </div>
     </div>
 
-    <!-- تنبيه الدعاء لعمي أحمد (يظهر مرة واحدة عند فتح التطبيق) -->
-    <div id="condolence-modal" class="modal condolence-modal">
-        <div class="modal-content condolence-content">
-            <div class="condolence-icon">
-                <i class="fas fa-hands-praying"></i>
-            </div>
-            <h3 class="condolence-title">إنا لله وإنا إليه راجعون</h3>
-            <p class="condolence-name">عمي أحمد كمال</p>
-            <p class="condolence-text">اللهم اغفر له وارحمه وعافه واعفُ عنه وأكرم نُزُله ووسّع مدخله</p>
-            <button id="close-condolence" class="condolence-btn">اللهم آمين 🤲</button>
-        </div>
-    </div>
 
     <!-- تنبيه الصلاة على النبي -->
     <div id="salawat-modal" class="modal salawat-modal">

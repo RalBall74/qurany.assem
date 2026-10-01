@@ -74,6 +74,7 @@ const translationMap = {
     "مشاركة مباشرة": "Share directly",
     "اختر حلقة": "Select Episode",
     "لا يوجد اتصال بالإنترنت - تعمل فقط السور المحملة": "No Internet Connection - Only downloaded Surahs work",
+    "لا يوجد اتصال بالإنترنت - يتم تكرار السورة المحملة تلقائياً": "No Internet Connection - Repeating downloaded Surah automatically",
     "ابحث عن سورة أو آية...": "Search for Surah or Ayah...",
     "ابحث عن كلمة في القرآن...": "Search for a word in Quran...",
     "سورة": "Surah",
