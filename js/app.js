@@ -85,8 +85,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const athkarMorningEveningView = document.getElementById('athkar-morning-evening-view');
     const asmaAllahView = document.getElementById('asma-allah-view');
 
-    // حالة التطبيق والحاجات اللي بتتحفظ
-    let surahs = [];
+    // اسم الكاش المتوافق مع الـ Service Worker
+    const APP_CACHE_NAME = 'quran-app-v13';
+
+    // تنظيف أسماء السور وتحويل السكون العثماني النادر إلى سكون قياسي متوافق مع كافة الخطوط المخصصة
+    function normalizeSurahDisplayName(name) {
+        if (!name) return "";
+        return name
+            .replace(/\u06E1/g, '\u0652') // تحويل رأس الخاء الصغيرة (السكون العثماني) لسكون قياسي
+            .replace(/[\u06D6-\u06E0\u06E2-\u06ED]/g, ''); // إزالة العلامات العثمانية النادرة غير المدعومة بالخطوط
+    }
+
+    // تهيئة السور فوراً من البيانات المسبقة أو الـ LocalStorage لضمان العمل 100% بدون نت ومن أول ثانية
+    let initialSurahs = (typeof DEFAULT_SURAHS !== 'undefined' && Array.isArray(DEFAULT_SURAHS)) ? DEFAULT_SURAHS : [];
+    try {
+        const savedSurahs = localStorage.getItem('quran_surahs_cache');
+        if (savedSurahs) {
+            const parsed = JSON.parse(savedSurahs);
+            if (Array.isArray(parsed) && parsed.length > 0) initialSurahs = parsed;
+        }
+    } catch (e) {}
+
+    let surahs = initialSurahs.map(s => ({
+        ...s,
+        name: normalizeSurahDisplayName(s.name)
+    }));
     let reciter = recitersData[0];
     let curIdx = -1;
     let favorites = JSON.parse(localStorage.getItem('quran_favorites')) || [];
@@ -214,10 +237,16 @@ document.addEventListener('DOMContentLoaded', () => {
     init();
 
     async function init() {
-        // console.log('Starting app...');
+        // حماية مساحة التخزين من مسح المتصفح التلقائي عند عدم فتح التطبيق لفترة طويلة
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().catch(() => {});
+        }
+
         renderReciters();
+        if (surahs.length > 0) {
+            renderSurahs(surahs);
+        }
         await fetchSurahs();
-        // console.log('Surahs ready:', surahs.length);
         loadLastPlayback(); // Resume last session
         setupEventListeners();
         applyTheme();
@@ -401,26 +430,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // جلب بيانات السور من الـ API
     async function fetchSurahs() {
-        showSurahSkeletons(); // أظهر الهياكل فوراً قبل البدء
+        if (!surahs || surahs.length === 0) {
+            showSurahSkeletons(); // أظهر الهياكل فقط إذا لم تكن هناك سور محملة
+        }
         const url = 'https://api.alquran.cloud/v1/surah';
 
-        // جرب نجيب من الكاش الأول عشان السرعة
+        // محاولة جلب من الكاش
         try {
-            const cache = await caches.open('quran-app-v10');
+            const cache = await caches.open(APP_CACHE_NAME);
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
-                surahs = data.data;
-                renderSurahs(surahs);
-                // كمل برضه وهات النسخة الجديدة من النت في الخلفية لو عاوز بس كفاية كدة دلوقتى
+                if (data && data.data && data.data.length > 0) {
+                    surahs = data.data.map(s => ({
+                        ...s,
+                        name: normalizeSurahDisplayName(s.name)
+                    }));
+                    renderSurahs(surahs);
+                }
             }
         } catch (e) { console.log('Cache read error:', e); }
 
         try {
             const response = await fetch(url);
             const data = await response.json();
-            surahs = data.data;
-            renderSurahs(surahs);
+            if (data && data.data && data.data.length > 0) {
+                surahs = data.data.map(s => ({
+                    ...s,
+                    name: normalizeSurahDisplayName(s.name)
+                }));
+                try {
+                    localStorage.setItem('quran_surahs_cache', JSON.stringify(surahs));
+                } catch (e) {}
+                renderSurahs(surahs);
+            }
         } catch (error) {
             console.error('Error fetching surahs:', error);
             if (surahs.length === 0) {
@@ -435,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // جرب الكاش الأول
         try {
-            const cache = await caches.open('quran-app-v10');
+            const cache = await caches.open(APP_CACHE_NAME);
             const cachedResponse = await cache.match(url);
             if (cachedResponse) {
                 const data = await cachedResponse.json();
@@ -2480,7 +2523,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const audioCache = await caches.open('quran-audio-v1');
-            const apiCache = await caches.open('quran-app-v10');
+            const apiCache = await caches.open(APP_CACHE_NAME);
 
             // نحمل ملف الصوت ونحطه في الكاش
             // لازم نستخدم fetch عادي (مش no-cors) عشان الـ opaque response مش بيشتغل مع الـ audio player
